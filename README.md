@@ -1,2 +1,2 @@
 # NBS Player
- Play music block songs in Minecraft
+ Play note block songs in Minecraft

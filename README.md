@@ -9,3 +9,8 @@
  - A little anti-cheat detection prevention
  - Compatible with almost every Minecraft version (only 1.18.1 tested)
  - Works with any song
+
+## Usage
+ 1. Join any world
+ 2. Run the command /discjockey
+ 3. Select any song and choose an action at the bottom of the screen

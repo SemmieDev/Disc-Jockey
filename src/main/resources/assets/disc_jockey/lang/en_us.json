@@ -1,0 +1,14 @@
+{
+  "disc_jockey.screen.title": "Disc Jockey",
+  "disc_jockey.screen.select_song": "Select A Song",
+  "disc_jockey.screen.play": "Play",
+  "disc_jockey.screen.play.stop": "Stop Playing",
+  "disc_jockey.screen.preview": "Preview",
+  "disc_jockey.screen.preview.stop": "Stop Previewing",
+  "disc_jockey.screen.blocks.title": "Blocks",
+  "disc_jockey.screen.blocks": "Blocks",
+  "disc_jockey.screen.search": "Search For Songs",
+  "disc_jockey.player.invalid_note_blocks": "The Note Blocks near you are not in the correct configuration. Missing:",
+  "disc_jockey.player.invalid_game_mode": "You can't play in %s",
+  "disc_jockey.player.to_far": "You went to far away"
+}

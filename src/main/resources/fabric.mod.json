@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "disc_jockey",
+  "version": "${version}",
+  "name": "Disc Jockey",
+  "description": "Play note block songs in Minecraft",
+  "authors": [
+    "Semmieboy YT"
+  ],
+  "contact": {
+    "repo": "https://github.com/SemmieboyYT/Disc-Jockey"
+  },
+  "license": "MIT",
+  "icon": "assets/disc_jockey/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "semmieboy_yt.disc_jockey.Main"
+    ]
+  },
+  "depends": {
+    "fabric": "*"
+  }
+}

@@ -67,10 +67,10 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                         BlockPos blockPos = new BlockPos(pos);
                         if (playerPos.squaredDistanceTo(pos) < 4.5 * 4.5) {
                             BlockState blockState = world.getBlockState(blockPos);
-                            if (blockState.isOf(Blocks.NOTE_BLOCK)) {
+                            if (blockState.isOf(Blocks.NOTE_BLOCK) && world.isAir(blockPos.up())) {
                                 for (Note note : song.uniqueNotes) {
-                                    if (!capturedNotes.contains(note) && blockState.get(Properties.INSTRUMENT) == note.instrument()) {
-                                        getNotes(note.instrument()).put(note.note(), blockPos);
+                                    if (!capturedNotes.contains(note) && blockState.get(Properties.INSTRUMENT) == note.instrument) {
+                                        getNotes(note.instrument).put(note.note, blockPos);
                                         capturedNotes.add(note);
                                         break;
                                     }
@@ -89,7 +89,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
                 HashMap<Block, Integer> missing = new HashMap<>();
                 for (Note note : missingNotes) {
-                    Block block = Note.INSTRUMENT_BLOCKS.get(note.instrument());
+                    Block block = Note.INSTRUMENT_BLOCKS.get(note.instrument);
                     Integer got = missing.get(block);
                     if (got == null) got = 0;
                     missing.put(block, got + 1);
@@ -107,11 +107,11 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             MinecraftClient client = MinecraftClient.getInstance();
             int tuneAmount = 0;
             for (Note note : song.uniqueNotes) {
-                BlockPos blockPos = noteBlocks.get(note.instrument()).get(note.note());
+                BlockPos blockPos = noteBlocks.get(note.instrument).get(note.note);
                 BlockState blockState = world.getBlockState(blockPos);
 
                 if (blockState.contains(Properties.NOTE)) {
-                    if (blockState.get(Properties.NOTE) != note.note()) {
+                    if (blockState.get(Properties.NOTE) != note.note) {
                         if (client.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter(blockPos, 0.5)) >= 4.5 * 4.5) {
                             stop();
                             client.inGameHud.getChatHud().addMessage(new TranslatableText(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));

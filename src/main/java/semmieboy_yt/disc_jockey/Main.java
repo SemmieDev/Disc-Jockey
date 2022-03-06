@@ -5,6 +5,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import semmieboy_yt.disc_jockey.gui.hud.BlocksOverlay;
@@ -30,6 +32,18 @@ public class Main implements ClientModInitializer {
 
         SongLoader.loadSongs();
 
+        ClientTickEvents.START_CLIENT_TICK.register(new ClientTickEvents.StartTick() {
+            private ClientWorld prevWorld;
+
+            @Override
+            public void onStartTick(MinecraftClient client) {
+                if (prevWorld != client.world) {
+                    PREVIEWER.stop();
+                    SONG_PLAYER.stop();
+                }
+                prevWorld = client.world;
+            }
+        });
         ClientTickEvents.START_WORLD_TICK.register(world -> {
             for (ClientTickEvents.StartWorldTick listener : TICK_LISTENERS) listener.onStartTick(world);
         });

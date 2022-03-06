@@ -68,36 +68,41 @@ public class DiscJockeyScreen extends Screen {
         addDrawableChild(previewButton);
 
         addDrawableChild(new ButtonWidget(width / 2 + 60, height - 61, 100, 20, new TranslatableText(Main.MOD_ID+".screen.blocks"), button -> {
-            SongListWidget.SongEntry entry = songListWidget.getSelectedOrNull();
-            if (entry != null) {
-                client.setScreen(null);
-                Song song = SongLoader.SONGS.get(entry.index);
+            if (BlocksOverlay.itemStacks == null) {
+                SongListWidget.SongEntry entry = songListWidget.getSelectedOrNull();
+                if (entry != null) {
+                    client.setScreen(null);
+                    Song song = SongLoader.SONGS.get(entry.index);
 
-                BlocksOverlay.itemStacks = new ItemStack[0];
-                BlocksOverlay.amounts = new int[0];
-                BlocksOverlay.amountOfNoteBlocks = song.uniqueNotes.size();
+                    BlocksOverlay.itemStacks = new ItemStack[0];
+                    BlocksOverlay.amounts = new int[0];
+                    BlocksOverlay.amountOfNoteBlocks = song.uniqueNotes.size();
 
-                for (Note note : song.uniqueNotes) {
-                    ItemStack itemStack = Note.INSTRUMENT_BLOCKS.get(note.instrument()).asItem().getDefaultStack();
-                    int index = -1;
+                    for (Note note : song.uniqueNotes) {
+                        ItemStack itemStack = Note.INSTRUMENT_BLOCKS.get(note.instrument).asItem().getDefaultStack();
+                        int index = -1;
 
-                    for (int i = 0; i < BlocksOverlay.itemStacks.length; i++) {
-                        if (BlocksOverlay.itemStacks[i].getItem() == itemStack.getItem()) {
-                            index = i;
-                            break;
+                        for (int i = 0; i < BlocksOverlay.itemStacks.length; i++) {
+                            if (BlocksOverlay.itemStacks[i].getItem() == itemStack.getItem()) {
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        if (index == -1) {
+                            BlocksOverlay.itemStacks = Arrays.copyOf(BlocksOverlay.itemStacks, BlocksOverlay.itemStacks.length + 1);
+                            BlocksOverlay.amounts = Arrays.copyOf(BlocksOverlay.amounts, BlocksOverlay.amounts.length + 1);
+
+                            BlocksOverlay.itemStacks[BlocksOverlay.itemStacks.length - 1] = itemStack;
+                            BlocksOverlay.amounts[BlocksOverlay.amounts.length - 1] = 1;
+                        } else {
+                            BlocksOverlay.amounts[index] = BlocksOverlay.amounts[index] + 1;
                         }
                     }
-
-                    if (index == -1) {
-                        BlocksOverlay.itemStacks = Arrays.copyOf(BlocksOverlay.itemStacks, BlocksOverlay.itemStacks.length + 1);
-                        BlocksOverlay.amounts = Arrays.copyOf(BlocksOverlay.amounts, BlocksOverlay.amounts.length + 1);
-
-                        BlocksOverlay.itemStacks[BlocksOverlay.itemStacks.length - 1] = itemStack;
-                        BlocksOverlay.amounts[BlocksOverlay.amounts.length - 1] = 1;
-                    } else {
-                        BlocksOverlay.amounts[index] = BlocksOverlay.amounts[index] + 1;
-                    }
                 }
+            } else {
+                BlocksOverlay.itemStacks = null;
+                client.setScreen(null);
             }
         }));
 

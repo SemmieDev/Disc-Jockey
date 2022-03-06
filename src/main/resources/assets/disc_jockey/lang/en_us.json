@@ -10,5 +10,6 @@
   "disc_jockey.screen.search": "Search For Songs",
   "disc_jockey.player.invalid_note_blocks": "The Note Blocks near you are not in the correct configuration. Missing:",
   "disc_jockey.player.invalid_game_mode": "You can't play in %s",
-  "disc_jockey.player.to_far": "You went to far away"
+  "disc_jockey.player.to_far": "You went to far away",
+  "disc_jockey.still_loading": "The songs are still loading"
 }

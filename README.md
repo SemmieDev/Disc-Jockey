@@ -7,7 +7,7 @@
  ## Features
  - Easy to use GUI
  - A little anti-cheat detection prevention
- - Compatible with almost every Minecraft version (only 1.18.1 tested)
+ - Compatible with almost every Minecraft version (only 1.18 tested)
  - Works with any song
 
 ## Usage

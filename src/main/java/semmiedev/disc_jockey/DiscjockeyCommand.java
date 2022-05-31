@@ -27,7 +27,6 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.lit
 public class DiscjockeyCommand {
     public static void register() {
         ClientCommandManager.DISPATCHER.register(
-                // TODO: 5/30/2022 Add play/stop sub-commands
                 literal("discjockey")
                         .executes(context -> {
                             FabricClientCommandSource source = context.getSource();

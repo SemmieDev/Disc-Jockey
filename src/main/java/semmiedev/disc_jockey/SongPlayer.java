@@ -65,7 +65,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 for (int y = -7; y <= 7; y++) {
                     for (int z = -7; z <= 7; z++) {
                         BlockPos blockPos = new BlockPos(playerPos.add(x, y, z));
-                        if (intersect(playerPos, 4.5, BOX.offset(blockPos))) {
+                        if (intersect(playerPos, MinecraftClient.getInstance().interactionManager.getReachDistance(), BOX.offset(blockPos))) {
                             BlockState blockState = world.getBlockState(blockPos);
                             if (blockState.isOf(Blocks.NOTE_BLOCK) && world.isAir(blockPos.up())) {
                                 for (Note note : song.uniqueNotes) {
@@ -112,7 +112,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
                 if (blockState.contains(Properties.NOTE)) {
                     if (blockState.get(Properties.NOTE) != note.note) {
-                        if (!intersect(client.player.getEyePos(), 4.5, BOX.offset(blockPos))) {
+                        if (!intersect(client.player.getEyePos(), client.interactionManager.getReachDistance(), BOX.offset(blockPos))) {
                             stop();
                             client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
                             return;
@@ -143,7 +143,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 long note = song.notes[index];
                 if ((short)note == Math.round(tick)) {
                     BlockPos blockPos = noteBlocks.get(Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)]).get((byte)(note >> Note.NOTE_SHIFT));
-                    if (!intersect(client.player.getEyePos(), 4.5, BOX.offset(blockPos))) {
+                    if (!intersect(client.player.getEyePos(), client.interactionManager.getReachDistance(), BOX.offset(blockPos))) {
                         stop();
                         client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
                         return;

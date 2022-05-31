@@ -1,14 +1,19 @@
-package semmieboy_yt.disc_jockey;
+package semmiedev.disc_jockey;
 
-import semmieboy_yt.disc_jockey.gui.SongListWidget;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.toast.SystemToast;
+import net.minecraft.text.Text;
+import semmiedev.disc_jockey.gui.SongListWidget;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SongLoader {
     public static final ArrayList<Song> SONGS = new ArrayList<>();
+    public static final ArrayList<String> SONG_SUGGESTIONS = new ArrayList<>();
     public static volatile boolean loadingSongs;
 
     public static void loadSongs() {
@@ -16,10 +21,12 @@ public class SongLoader {
         new Thread(() -> {
             loadingSongs = true;
             SONGS.clear();
+            SONG_SUGGESTIONS.clear();
+            SONG_SUGGESTIONS.add("Songs are loading, please wait");
             for (File file : Main.songsFolder.listFiles()) {
                 if (file.isFile()) {
                     try {
-                        BinaryReader reader = new BinaryReader(new FileInputStream(file));
+                        BinaryReader reader = new BinaryReader(Files.newInputStream(file.toPath()));
                         Song song = new Song();
 
                         song.fileName = file.getName();
@@ -55,7 +62,8 @@ public class SongLoader {
                             song.loopStartTick = reader.readShort();
                         }
 
-                        song.entry = new SongListWidget.SongEntry(song.name.replaceAll("\\s", "").isEmpty() ? song.fileName : song.name+" ("+song.fileName+")", SONGS.size());
+                        song.displayName = song.name.replaceAll("\\s", "").isEmpty() ? song.fileName : song.name+" ("+song.fileName+")";
+                        song.entry = new SongListWidget.SongEntry(song.displayName, SONGS.size());
                         song.searchableFileName = song.fileName.toLowerCase().replaceAll("\\s", "");
                         song.searchableName = song.name.toLowerCase().replaceAll("\\s", "");
 
@@ -97,6 +105,8 @@ public class SongLoader {
                     }
                 }
             }
+            for (Song song : SONGS) SONG_SUGGESTIONS.add(song.displayName);
+            SystemToast.add(MinecraftClient.getInstance().getToastManager(), SystemToast.Type.PACK_LOAD_FAILURE, Main.NAME, Text.translatable(Main.MOD_ID+".loading_done"));
             loadingSongs = false;
         }).start();
     }

@@ -1,10 +1,14 @@
-package semmieboy_yt.disc_jockey.gui;
+package semmiedev.disc_jockey.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
+import semmiedev.disc_jockey.Main;
 
 public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
     public SongListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
@@ -35,13 +39,17 @@ public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
     }
 
     public static class SongEntry extends Entry<SongEntry> {
+        private static final Identifier ICONS = new Identifier(Main.MOD_ID, "textures/gui/icons.png");
+
         public final int index;
 
-        public boolean selected;
+        public boolean selected, favorite;
         public SongListWidget songListWidget;
 
         private final String name;
         private final MinecraftClient client = MinecraftClient.getInstance();
+
+        private int x, y, entryWidth, entryHeight;
 
         public SongEntry(String name, int index) {
             this.name = name;
@@ -50,18 +58,31 @@ public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
 
         @Override
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            this.x = x; this.y = y; this.entryWidth = entryWidth; this.entryHeight = entryHeight;
+
             if (selected) {
                 fill(matrices, x, y, x + entryWidth, y + entryHeight, 0xFFFFFF);
                 fill(matrices, x + 1, y + 1, x + entryWidth - 1, y + entryHeight - 1, 0x000000);
             }
+
             drawCenteredText(matrices, client.textRenderer, name, x + entryWidth / 2, y + 5, selected ? 0xFFFFFF : 0x808080);
+
+            RenderSystem.setShaderTexture(0, ICONS);
+            drawTexture(matrices, x + 2, y + 2, (favorite ? 26 : 0) + (isOverFavoriteButton(mouseX, mouseY) ? 13 : 0), 0, 13, 12, 52, 12);
         }
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            // it always gets clicked on
+            if (isOverFavoriteButton(mouseX, mouseY)) {
+                favorite = !favorite;
+                return true;
+            }
             songListWidget.setSelected(this);
             return true;
+        }
+
+        private boolean isOverFavoriteButton(double mouseX, double mouseY) {
+            return mouseX > x + 2 && mouseX < x + 15 && mouseY > y + 2 && mouseY < y + 14;
         }
     }
 }

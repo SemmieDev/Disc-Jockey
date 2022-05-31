@@ -1,4 +1,4 @@
-package semmieboy_yt.disc_jockey;
+package semmiedev.disc_jockey;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

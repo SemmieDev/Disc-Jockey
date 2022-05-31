@@ -1,4 +1,4 @@
-package semmieboy_yt.disc_jockey.gui.hud;
+package semmiedev.disc_jockey.gui.hud;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;

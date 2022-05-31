@@ -1,4 +1,4 @@
-package semmieboy_yt.disc_jockey;
+package semmiedev.disc_jockey;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -7,15 +7,19 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import semmieboy_yt.disc_jockey.gui.hud.BlocksOverlay;
+import semmiedev.disc_jockey.gui.hud.BlocksOverlay;
 
 import java.io.File;
 import java.util.ArrayList;
 
+// TODO: 5/31/2022 Add key bind to open disc jockey screen
 public class Main implements ClientModInitializer {
     public static final String MOD_ID = "disc_jockey";
+    public static final MutableText NAME = Text.literal("Disc Jockey");
     public static final Logger LOGGER = LogManager.getLogger("Disc Jockey");
     public static final ArrayList<ClientTickEvents.StartWorldTick> TICK_LISTENERS = new ArrayList<>();
     public static final Previewer PREVIEWER = new Previewer();

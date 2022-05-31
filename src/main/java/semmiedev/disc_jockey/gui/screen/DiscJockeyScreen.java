@@ -1,45 +1,46 @@
-package semmieboy_yt.disc_jockey.gui.screen;
+package semmiedev.disc_jockey.gui.screen;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.TranslatableText;
-import semmieboy_yt.disc_jockey.Main;
-import semmieboy_yt.disc_jockey.Note;
-import semmieboy_yt.disc_jockey.Song;
-import semmieboy_yt.disc_jockey.SongLoader;
-import semmieboy_yt.disc_jockey.gui.SongListWidget;
-import semmieboy_yt.disc_jockey.gui.hud.BlocksOverlay;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import semmiedev.disc_jockey.Main;
+import semmiedev.disc_jockey.Note;
+import semmiedev.disc_jockey.Song;
+import semmiedev.disc_jockey.SongLoader;
+import semmiedev.disc_jockey.gui.SongListWidget;
+import semmiedev.disc_jockey.gui.hud.BlocksOverlay;
 
 import java.util.Arrays;
 
 public class DiscJockeyScreen extends Screen {
-    private static final TranslatableText
-            SELECT_SONG = new TranslatableText(Main.MOD_ID+".screen.select_song"),
-            PLAY = new TranslatableText(Main.MOD_ID+".screen.play"),
-            PLAY_STOP = new TranslatableText(Main.MOD_ID+".screen.play.stop"),
-            PREVIEW = new TranslatableText(Main.MOD_ID+".screen.preview"),
-            PREVIEW_STOP = new TranslatableText(Main.MOD_ID+".screen.preview.stop")
+    private static final MutableText
+            SELECT_SONG = Text.translatable(Main.MOD_ID+".screen.select_song"),
+            PLAY = Text.translatable(Main.MOD_ID+".screen.play"),
+            PLAY_STOP = Text.translatable(Main.MOD_ID+".screen.play.stop"),
+            PREVIEW = Text.translatable(Main.MOD_ID+".screen.preview"),
+            PREVIEW_STOP = Text.translatable(Main.MOD_ID+".screen.preview.stop")
     ;
 
     private SongListWidget songListWidget;
     private ButtonWidget playButton, previewButton;
     private boolean shouldFilter;
-    private String query;
+    private String query = "";
 
     public DiscJockeyScreen() {
-        super(new TranslatableText(Main.MOD_ID+".screen.title"));
+        super(Main.NAME);
     }
 
     @Override
     protected void init() {
+        shouldFilter = true;
         songListWidget = new SongListWidget(client, width, height, 32, height - 64, 20);
         addDrawableChild(songListWidget);
         for (int i = 0; i < SongLoader.SONGS.size(); i++) {
             Song song = SongLoader.SONGS.get(i);
-            songListWidget.children().add(song.entry);
             song.entry.songListWidget = songListWidget;
             if (song.entry.selected) songListWidget.setSelected(song.entry);
         }
@@ -67,7 +68,7 @@ public class DiscJockeyScreen extends Screen {
         });
         addDrawableChild(previewButton);
 
-        addDrawableChild(new ButtonWidget(width / 2 + 60, height - 61, 100, 20, new TranslatableText(Main.MOD_ID+".screen.blocks"), button -> {
+        addDrawableChild(new ButtonWidget(width / 2 + 60, height - 61, 100, 20, Text.translatable(Main.MOD_ID+".screen.blocks"), button -> {
             if (BlocksOverlay.itemStacks == null) {
                 SongListWidget.SongEntry entry = songListWidget.getSelectedOrNull();
                 if (entry != null) {
@@ -106,9 +107,11 @@ public class DiscJockeyScreen extends Screen {
             }
         }));
 
-        TextFieldWidget searchBar = new TextFieldWidget(textRenderer, width / 2 - 75, height - 31, 150, 20, new TranslatableText(Main.MOD_ID+".screen.search"));
+        TextFieldWidget searchBar = new TextFieldWidget(textRenderer, width / 2 - 75, height - 31, 150, 20, Text.translatable(Main.MOD_ID+".screen.search"));
         searchBar.setChangedListener(query -> {
-            this.query = query.toLowerCase().replaceAll("\\s", "");
+            query = query.toLowerCase().replaceAll("\\s", "");
+            if (this.query.equals(query)) return;
+            this.query = query;
             shouldFilter = true;
         });
         addDrawableChild(searchBar);
@@ -130,17 +133,22 @@ public class DiscJockeyScreen extends Screen {
             shouldFilter = false;
             songListWidget.setScrollAmount(0);
             songListWidget.children().clear();
-            for (Song song : SongLoader.SONGS) if (song.searchableFileName.contains(query) || song.searchableName.contains(query)) songListWidget.children().add(song.entry);
+            boolean empty = query.isEmpty();
+            int favoriteIndex = 0;
+            for (Song song : SongLoader.SONGS) {
+                if (empty || song.searchableFileName.contains(query) || song.searchableName.contains(query)) {
+                    if (song.entry.favorite) {
+                        songListWidget.children().add(favoriteIndex++, song.entry);
+                    } else {
+                        songListWidget.children().add(song.entry);
+                    }
+                }
+            }
         }
     }
 
     @Override
     public boolean shouldPause() {
         return false;
-    }
-
-    @Override
-    public void onClose() {
-        super.onClose();
     }
 }

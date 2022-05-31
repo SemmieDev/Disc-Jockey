@@ -1,4 +1,4 @@
-package semmieboy_yt.disc_jockey;
+package semmiedev.disc_jockey;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;

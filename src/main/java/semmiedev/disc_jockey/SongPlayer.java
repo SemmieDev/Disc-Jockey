@@ -1,4 +1,4 @@
-package semmieboy_yt.disc_jockey;
+package semmiedev.disc_jockey;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.block.Block;
@@ -11,8 +11,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -27,15 +26,16 @@ import java.util.HashMap;
 
 public class SongPlayer implements ClientTickEvents.StartWorldTick {
     public boolean running;
+    public Song song;
 
     private int index;
     private float tick;
-    private Song song;
     private HashMap<Instrument, HashMap<Byte, BlockPos>> noteBlocks = null;
     private boolean tuned;
     private int tuneDelay = 5;
 
     public void start(Song song) {
+        if (running) stop();
         this.song = song;
         Main.TICK_LISTENERS.add(this);
         running = true;
@@ -85,7 +85,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             missingNotes.removeAll(capturedNotes);
             if (!missingNotes.isEmpty()) {
                 ChatHud chatHud = MinecraftClient.getInstance().inGameHud.getChatHud();
-                chatHud.addMessage(new TranslatableText(Main.MOD_ID+".player.invalid_note_blocks").formatted(Formatting.RED));
+                chatHud.addMessage(Text.translatable(Main.MOD_ID+".player.invalid_note_blocks").formatted(Formatting.RED));
 
                 HashMap<Block, Integer> missing = new HashMap<>();
                 for (Note note : missingNotes) {
@@ -95,7 +95,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                     missing.put(block, got + 1);
                 }
 
-                missing.forEach((block, integer) -> chatHud.addMessage(new LiteralText(block.getName().getString()+" × "+integer).formatted(Formatting.RED)));
+                missing.forEach((block, integer) -> chatHud.addMessage(Text.literal(block.getName().getString()+" × "+integer).formatted(Formatting.RED)));
                 stop();
             }
         } else if (!tuned) {
@@ -114,12 +114,12 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                     if (blockState.get(Properties.NOTE) != note.note) {
                         if (client.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter(blockPos, 0.5)) >= 4.5 * 4.5) {
                             stop();
-                            client.inGameHud.getChatHud().addMessage(new TranslatableText(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
+                            client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
                             return;
                         }
                         Vec3d unit = Vec3d.ofCenter(blockPos, 0.5).subtract(client.player.getEyePos()).normalize();
                         client.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(MathHelper.wrapDegrees((float)(MathHelper.atan2(unit.z, unit.x) * 57.2957763671875) - 90.0f), MathHelper.wrapDegrees((float)(-(MathHelper.atan2(unit.y, Math.sqrt(unit.x * unit.x + unit.z * unit.z)) * 57.2957763671875))), true));
-                        client.interactionManager.interactBlock(client.player, world, Hand.MAIN_HAND, new BlockHitResult(Vec3d.of(blockPos), Direction.UP, blockPos, false));
+                        client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND, new BlockHitResult(Vec3d.of(blockPos), Direction.UP, blockPos, false));
                         client.player.swingHand(Hand.MAIN_HAND);
                         tuned = false;
                         tuneDelay = 5;
@@ -135,7 +135,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 MinecraftClient client = MinecraftClient.getInstance();
                 GameMode gameMode = client.interactionManager.getCurrentGameMode();
                 if (!gameMode.isSurvivalLike()) {
-                    client.inGameHud.getChatHud().addMessage(new TranslatableText(Main.MOD_ID+".player.invalid_game_mode", gameMode.getTranslatableName()).formatted(Formatting.RED));
+                    client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.invalid_game_mode", gameMode.getTranslatableName()).formatted(Formatting.RED));
                     stop();
                     return;
                 }
@@ -143,13 +143,15 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 long note = song.notes[index];
                 if ((short)note == Math.round(tick)) {
                     BlockPos blockPos = noteBlocks.get(Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)]).get((byte)(note >> Note.NOTE_SHIFT));
+                    // TODO: 5/30/2022 Check if the cube is inside of a sphere with a centre of 4.5 centered on the eye pos instead
                     if (client.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter(blockPos, 0.5)) >= 4.5 * 4.5) {
                         stop();
-                        client.inGameHud.getChatHud().addMessage(new TranslatableText(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
+                        client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
                         return;
                     }
                     Vec3d unit = Vec3d.ofCenter(blockPos, 0.5).subtract(client.player.getEyePos()).normalize();
                     client.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(MathHelper.wrapDegrees((float)(MathHelper.atan2(unit.z, unit.x) * 57.2957763671875) - 90.0f), MathHelper.wrapDegrees((float)(-(MathHelper.atan2(unit.y, Math.sqrt(unit.x * unit.x + unit.z * unit.z)) * 57.2957763671875))), true));
+                    // TODO: 5/30/2022 Check if the block needs tuning
                     client.interactionManager.attackBlock(blockPos, Direction.UP);
                     client.player.swingHand(Hand.MAIN_HAND);
 

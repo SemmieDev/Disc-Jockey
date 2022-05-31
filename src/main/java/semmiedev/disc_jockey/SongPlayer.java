@@ -52,6 +52,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
     @Override
     public void onStartTick(ClientWorld world) {
+        if (!running) return;
         if (noteBlocks == null) {
             noteBlocks = new HashMap<>();
 

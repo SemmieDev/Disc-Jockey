@@ -62,10 +62,10 @@ public class SongLoader {
                             song.loopStartTick = reader.readShort();
                         }
 
-                        song.displayName = song.name.replaceAll("\\s", "").isEmpty() ? song.fileName : song.name+" ("+song.fileName+")";
+                        song.displayName = song.name.replaceAll("\\s|\\n|\\r", "").isEmpty() ? song.fileName : song.name+" ("+song.fileName+")";
                         song.entry = new SongListWidget.SongEntry(song.displayName, SONGS.size());
-                        song.searchableFileName = song.fileName.toLowerCase().replaceAll("\\s", "");
-                        song.searchableName = song.name.toLowerCase().replaceAll("\\s", "");
+                        song.searchableFileName = song.fileName.toLowerCase().replaceAll("\\s|\\n|\\r", "");
+                        song.searchableName = song.name.toLowerCase().replaceAll("\\s|\\n|\\r", "");
 
                         short tick = -1;
                         short jumps;

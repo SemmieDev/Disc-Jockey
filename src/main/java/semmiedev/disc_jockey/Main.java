@@ -22,7 +22,6 @@ import semmiedev.disc_jockey.gui.screen.DiscJockeyScreen;
 import java.io.File;
 import java.util.ArrayList;
 
-// TODO: 5/31/2022 Add key bind to open disc jockey screen
 public class Main implements ClientModInitializer {
     public static final String MOD_ID = "disc_jockey";
     public static final MutableText NAME = Text.literal("Disc Jockey");

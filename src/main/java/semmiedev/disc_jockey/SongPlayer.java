@@ -15,16 +15,15 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.GameMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SongPlayer implements ClientTickEvents.StartWorldTick {
+    private static final Box BOX = new Box(0, 0, 0, 1, 1, 1);
+
     public boolean running;
     public Song song;
 
@@ -35,6 +34,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
     private int tuneDelay = 5;
 
     public void start(Song song) {
+        // TODO: 5/31/2022 State that this mod is bannable once each session
         if (running) stop();
         this.song = song;
         Main.TICK_LISTENERS.add(this);
@@ -64,9 +64,8 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             for (int x = -7; x <= 7; x++) {
                 for (int y = -7; y <= 7; y++) {
                     for (int z = -7; z <= 7; z++) {
-                        Vec3d pos = playerPos.add(x, y, z);
-                        BlockPos blockPos = new BlockPos(pos);
-                        if (playerPos.squaredDistanceTo(pos) < 4.5 * 4.5) {
+                        BlockPos blockPos = new BlockPos(playerPos.add(x, y, z));
+                        if (intersect(playerPos, 4.5, BOX.offset(blockPos))) {
                             BlockState blockState = world.getBlockState(blockPos);
                             if (blockState.isOf(Blocks.NOTE_BLOCK) && world.isAir(blockPos.up())) {
                                 for (Note note : song.uniqueNotes) {
@@ -113,7 +112,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
                 if (blockState.contains(Properties.NOTE)) {
                     if (blockState.get(Properties.NOTE) != note.note) {
-                        if (client.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter(blockPos, 0.5)) >= 4.5 * 4.5) {
+                        if (!intersect(client.player.getEyePos(), 4.5, BOX.offset(blockPos))) {
                             stop();
                             client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
                             return;
@@ -144,8 +143,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 long note = song.notes[index];
                 if ((short)note == Math.round(tick)) {
                     BlockPos blockPos = noteBlocks.get(Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)]).get((byte)(note >> Note.NOTE_SHIFT));
-                    // TODO: 5/30/2022 Check if the cube is inside of a sphere with a centre of 4.5 centered on the eye pos instead
-                    if (client.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter(blockPos, 0.5)) >= 4.5 * 4.5) {
+                    if (!intersect(client.player.getEyePos(), 4.5, BOX.offset(blockPos))) {
                         stop();
                         client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
                         return;
@@ -168,6 +166,20 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
             tick += song.tempo / 100f / 20f;
         }
+    }
+
+    private boolean intersect(Vec3d pos, double radius, Box box) {
+        double x = Math.max(box.minX, Math.min(pos.x, box.maxX));
+        double y = Math.max(box.minY, Math.min(pos.y, box.maxY));
+        double z = Math.max(box.minZ, Math.min(pos.z, box.maxZ));
+
+        double distance = Math.sqrt(
+                (x - pos.x) * (x - pos.x) +
+                        (y - pos.y) * (y - pos.y) +
+                        (z - pos.z) * (z - pos.z)
+        );
+
+        return distance < radius;
     }
 
     private HashMap<Byte, BlockPos> getNotes(Instrument instrument) {

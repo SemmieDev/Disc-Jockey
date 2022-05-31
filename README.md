@@ -1,3 +1,5 @@
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M4M1BW6QS)
+
 # Disc Jockey
  Play note block songs in Minecraft
  

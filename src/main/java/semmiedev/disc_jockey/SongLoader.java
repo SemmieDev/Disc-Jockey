@@ -29,7 +29,7 @@ public class SongLoader {
                         BinaryReader reader = new BinaryReader(Files.newInputStream(file.toPath()));
                         Song song = new Song();
 
-                        song.fileName = file.getName();
+                        song.fileName = file.getName().replaceAll("[\\n\\r]", "");
 
                         song.length = reader.readShort();
 
@@ -41,10 +41,10 @@ public class SongLoader {
                         }
 
                         song.height = reader.readShort();
-                        song.name = reader.readString();
-                        song.author = reader.readString();
-                        song.originalAuthor = reader.readString();
-                        song.description = reader.readString();
+                        song.name = reader.readString().replaceAll("[\\n\\r]", "");
+                        song.author = reader.readString().replaceAll("[\\n\\r]", "");
+                        song.originalAuthor = reader.readString().replaceAll("[\\n\\r]", "");
+                        song.description = reader.readString().replaceAll("[\\n\\r]", "");
                         song.tempo = reader.readShort();
                         song.autoSaving = reader.readByte();
                         song.autoSavingDuration = reader.readByte();
@@ -54,7 +54,7 @@ public class SongLoader {
                         song.rightClicks = reader.readInt();
                         song.blocksAdded = reader.readInt();
                         song.blocksRemoved = reader.readInt();
-                        song.importFileName = reader.readString();
+                        song.importFileName = reader.readString().replaceAll("[\\n\\r]", "");
 
                         if (newFormat) {
                             song.loop = reader.readByte();
@@ -62,10 +62,10 @@ public class SongLoader {
                             song.loopStartTick = reader.readShort();
                         }
 
-                        song.displayName = song.name.replaceAll("\\s|\\n|\\r", "").isEmpty() ? song.fileName : song.name+" ("+song.fileName+")";
+                        song.displayName = song.name.replaceAll("\\s", "").isEmpty() ? song.fileName : song.name+" ("+song.fileName+")";
                         song.entry = new SongListWidget.SongEntry(song.displayName, SONGS.size());
-                        song.searchableFileName = song.fileName.toLowerCase().replaceAll("\\s|\\n|\\r", "");
-                        song.searchableName = song.name.toLowerCase().replaceAll("\\s|\\n|\\r", "");
+                        song.searchableFileName = song.fileName.toLowerCase().replaceAll("\\s", "");
+                        song.searchableName = song.name.toLowerCase().replaceAll("\\s", "");
 
                         short tick = -1;
                         short jumps;

@@ -5,7 +5,7 @@
   "name": "Disc Jockey",
   "description": "Play note block songs in Minecraft",
   "authors": [
-    "Semmieboy YT"
+    "SemmieDev"
   ],
   "contact": {
     "repo": "https://github.com/SemmieboyYT/Disc-Jockey"
@@ -15,10 +15,14 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "semmieboy_yt.disc_jockey.Main"
+      "semmiedev.disc_jockey.Main"
     ]
   },
   "depends": {
-    "fabric": "*"
+    "fabric-command-api-v2": "*",
+    "fabric-lifecycle-events-v1": "*",
+    "fabric-networking-api-v1": "*",
+    "fabric-rendering-v1": "*",
+    "minecraft": "1.19-beta.4"
   }
 }

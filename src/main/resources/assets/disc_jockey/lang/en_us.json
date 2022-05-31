@@ -11,7 +11,7 @@
   "disc_jockey.player.invalid_game_mode": "You can't play in %s",
   "disc_jockey.player.to_far": "You went to far away",
   "disc_jockey.still_loading": "The songs are still loading",
-  "disc_jockey.loading": "Reloading all songs",
+  "disc_jockey.reloading": "Reloading all songs",
   "disc_jockey.loading_done": "All songs are loaded",
   "disc_jockey.song_not_found": " Song '%s' does not exist",
   "disc_jockey.not_playing": "Not playing any song",

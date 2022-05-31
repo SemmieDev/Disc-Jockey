@@ -15,5 +15,7 @@
   "disc_jockey.loading_done": "All songs are loaded",
   "disc_jockey.song_not_found": " Song '%s' does not exist",
   "disc_jockey.not_playing": "Not playing any song",
-  "disc_jockey.stopped_playing": "Stopped playing '%s'"
+  "disc_jockey.stopped_playing": "Stopped playing '%s'",
+  "key.category.disc_jockey": "Disc Jockey",
+  "disc_jockey.key_bind.open_screen": "Open song selection screen"
 }

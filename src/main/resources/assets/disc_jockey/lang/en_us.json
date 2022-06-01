@@ -17,5 +17,9 @@
   "disc_jockey.not_playing": "Not playing any song",
   "disc_jockey.stopped_playing": "Stopped playing '%s'",
   "key.category.disc_jockey": "Disc Jockey",
-  "disc_jockey.key_bind.open_screen": "Open song selection screen"
+  "disc_jockey.key_bind.open_screen": "Open song selection screen",
+  "text.autoconfig.disc_jockey.title": "Disc Jockey",
+  "text.autoconfig.disc_jockey.option.hideWarning": "Hide Warning",
+  "text.autoconfig.disc_jockey.option.monoNoteBlocks": "Mono Note Block Sounds",
+  "text.autoconfig.disc_jockey.option.monoNoteBlocks.@Tooltip": "Makes all the note block sounds mono instead of stereo, creating a more pleasurable listening experience (clientside)"
 }

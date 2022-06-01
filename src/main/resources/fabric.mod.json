@@ -16,6 +16,9 @@
   "entrypoints": {
     "client": [
       "semmiedev.disc_jockey.Main"
+    ],
+    "modmenu": [
+      "semmiedev.disc_jockey.ModMenuIntegration"
     ]
   },
   "depends": {

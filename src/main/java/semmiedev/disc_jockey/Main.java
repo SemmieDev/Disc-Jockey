@@ -4,6 +4,7 @@ import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
@@ -45,8 +46,6 @@ public class Main implements ClientModInitializer {
         songsFolder = new File(FabricLoader.getInstance().getConfigDir()+File.separator+MOD_ID+File.separator+"songs");
         if (!songsFolder.isDirectory()) songsFolder.mkdirs();
 
-        DiscjockeyCommand.register();
-
         SongLoader.loadSongs();
 
         KeyBinding openScreenKeyBind = KeyBindingHelper.registerKeyBinding(new KeyBinding(MOD_ID+".key_bind.open_screen", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_J, "key.category."+MOD_ID));
@@ -74,6 +73,10 @@ public class Main implements ClientModInitializer {
 
         ClientTickEvents.START_WORLD_TICK.register(world -> {
             for (ClientTickEvents.StartWorldTick listener : TICK_LISTENERS) listener.onStartTick(world);
+        });
+
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            DiscjockeyCommand.register(dispatcher);
         });
 
         ClientLoginConnectionEvents.DISCONNECT.register((handler, client) -> {

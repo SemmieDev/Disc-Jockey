@@ -1,32 +1,22 @@
 package semmiedev.disc_jockey;
 
-import com.google.common.base.Predicate;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.server.command.PlaceCommand;
 import net.minecraft.text.Text;
 import semmiedev.disc_jockey.gui.screen.DiscJockeyScreen;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class DiscjockeyCommand {
-    public static void register() {
-        ClientCommandManager.DISPATCHER.register(
+    public static void register(CommandDispatcher<FabricClientCommandSource> commandDispatcher) {
+        commandDispatcher.register(
                 literal("discjockey")
                         .executes(context -> {
                             FabricClientCommandSource source = context.getSource();

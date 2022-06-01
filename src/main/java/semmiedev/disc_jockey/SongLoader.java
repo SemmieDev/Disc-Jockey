@@ -6,7 +6,6 @@ import net.minecraft.text.Text;
 import semmiedev.disc_jockey.gui.SongListWidget;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +62,8 @@ public class SongLoader {
                         }
 
                         song.displayName = song.name.replaceAll("\\s", "").isEmpty() ? song.fileName : song.name+" ("+song.fileName+")";
-                        song.entry = new SongListWidget.SongEntry(song.displayName, SONGS.size());
+                        song.entry = new SongListWidget.SongEntry(song, SONGS.size());
+                        song.entry.favorite = Main.config.favorites.contains(song.fileName);
                         song.searchableFileName = song.fileName.toLowerCase().replaceAll("\\s", "");
                         song.searchableName = song.name.toLowerCase().replaceAll("\\s", "");
 
@@ -106,6 +106,8 @@ public class SongLoader {
                 }
             }
             for (Song song : SONGS) SONG_SUGGESTIONS.add(song.displayName);
+            Main.config.favorites.removeIf(favorite -> SongLoader.SONGS.stream().map(song -> song.fileName).noneMatch(favorite::equals));
+
             SystemToast.add(MinecraftClient.getInstance().getToastManager(), SystemToast.Type.PACK_LOAD_FAILURE, Main.NAME, Text.translatable(Main.MOD_ID+".loading_done"));
             loadingSongs = false;
         }).start();

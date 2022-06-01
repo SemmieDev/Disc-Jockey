@@ -51,7 +51,7 @@ public class DiscJockeyScreen extends Screen {
             } else {
                 SongListWidget.SongEntry entry = songListWidget.getSelectedOrNull();
                 if (entry != null) {
-                    Main.SONG_PLAYER.start(SongLoader.SONGS.get(entry.index));
+                    Main.SONG_PLAYER.start(entry.song);
                     client.setScreen(null);
                 }
             }
@@ -63,7 +63,7 @@ public class DiscJockeyScreen extends Screen {
                 Main.PREVIEWER.stop();
             } else {
                 SongListWidget.SongEntry entry = songListWidget.getSelectedOrNull();
-                if (entry != null) Main.PREVIEWER.start(SongLoader.SONGS.get(entry.index));
+                if (entry != null) Main.PREVIEWER.start(entry.song);
             }
         });
         addDrawableChild(previewButton);
@@ -73,13 +73,12 @@ public class DiscJockeyScreen extends Screen {
                 SongListWidget.SongEntry entry = songListWidget.getSelectedOrNull();
                 if (entry != null) {
                     client.setScreen(null);
-                    Song song = SongLoader.SONGS.get(entry.index);
 
                     BlocksOverlay.itemStacks = new ItemStack[0];
                     BlocksOverlay.amounts = new int[0];
-                    BlocksOverlay.amountOfNoteBlocks = song.uniqueNotes.size();
+                    BlocksOverlay.amountOfNoteBlocks = entry.song.uniqueNotes.size();
 
-                    for (Note note : song.uniqueNotes) {
+                    for (Note note : entry.song.uniqueNotes) {
                         ItemStack itemStack = Note.INSTRUMENT_BLOCKS.get(note.instrument).asItem().getDefaultStack();
                         int index = -1;
 
@@ -150,5 +149,11 @@ public class DiscJockeyScreen extends Screen {
     @Override
     public boolean shouldPause() {
         return false;
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        new Thread(() -> Main.configHolder.save()).start();
     }
 }

@@ -1,7 +1,9 @@
 package semmiedev.disc_jockey;
 
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.ConfigHolder;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
@@ -31,9 +33,15 @@ public class Main implements ClientModInitializer {
     public static final SongPlayer SONG_PLAYER = new SongPlayer();
 
     public static File songsFolder;
+    public static Config config;
+    public static ConfigHolder<Config> configHolder;
 
     @Override
     public void onInitializeClient() {
+        // TODO: 5/31/2022 Add a note block mono mode, making all note block sounds play as mono instead of as stereo\
+        configHolder = AutoConfig.register(Config.class, JanksonConfigSerializer::new);
+        config = configHolder.getConfig();
+
         songsFolder = new File(FabricLoader.getInstance().getConfigDir()+File.separator+MOD_ID+File.separator+"songs");
         if (!songsFolder.isDirectory()) songsFolder.mkdirs();
 
@@ -63,13 +71,16 @@ public class Main implements ClientModInitializer {
                 }
             }
         });
+
         ClientTickEvents.START_WORLD_TICK.register(world -> {
             for (ClientTickEvents.StartWorldTick listener : TICK_LISTENERS) listener.onStartTick(world);
         });
+
         ClientLoginConnectionEvents.DISCONNECT.register((handler, client) -> {
             PREVIEWER.stop();
             SONG_PLAYER.stop();
         });
+
         HudRenderCallback.EVENT.register(BlocksOverlay::render);
     }
 }

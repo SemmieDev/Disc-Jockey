@@ -17,4 +17,9 @@ public class Song {
 
     public SongListWidget.SongEntry entry;
     public String searchableFileName, searchableName;
+
+    @Override
+    public String toString() {
+        return displayName;
+    }
 }

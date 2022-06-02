@@ -55,6 +55,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
         tuned = false;
     }
 
+    // TODO: 6/2/2022 Play note blocks every song tick, instead of every tick. That way the song will sound better
     @Override
     public void onStartTick(ClientWorld world) {
         if (!running) return;
@@ -178,13 +179,9 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
         double y = Math.max(box.minY, Math.min(pos.y, box.maxY));
         double z = Math.max(box.minZ, Math.min(pos.z, box.maxZ));
 
-        double distance = Math.sqrt(
-                (x - pos.x) * (x - pos.x) +
-                        (y - pos.y) * (y - pos.y) +
-                        (z - pos.z) * (z - pos.z)
-        );
+        double distance = (x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y) + (z - pos.z) * (z - pos.z);
 
-        return distance < radius;
+        return distance < radius * radius;
     }
 
     private HashMap<Byte, BlockPos> getNotes(Instrument instrument) {

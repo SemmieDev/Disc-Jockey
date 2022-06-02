@@ -16,6 +16,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -62,7 +63,7 @@ public class Main implements ClientModInitializer {
 
                 if (openScreenKeyBind.wasPressed()) {
                     if (SongLoader.loadingSongs) {
-                        client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".still_loading"));
+                        client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".still_loading").formatted(Formatting.RED));
                     } else {
                         client.setScreen(new DiscJockeyScreen());
                     }

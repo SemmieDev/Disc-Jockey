@@ -1,5 +1,6 @@
 package semmiedev.disc_jockey.gui.screen;
 
+import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -7,6 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import semmiedev.disc_jockey.Main;
 import semmiedev.disc_jockey.Note;
 import semmiedev.disc_jockey.Song;
@@ -14,16 +16,22 @@ import semmiedev.disc_jockey.SongLoader;
 import semmiedev.disc_jockey.gui.SongListWidget;
 import semmiedev.disc_jockey.gui.hud.BlocksOverlay;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-// TODO: 6/1/2022 Add a drag and drop action for songs
 public class DiscJockeyScreen extends Screen {
     private static final MutableText
             SELECT_SONG = Text.translatable(Main.MOD_ID+".screen.select_song"),
             PLAY = Text.translatable(Main.MOD_ID+".screen.play"),
             PLAY_STOP = Text.translatable(Main.MOD_ID+".screen.play.stop"),
             PREVIEW = Text.translatable(Main.MOD_ID+".screen.preview"),
-            PREVIEW_STOP = Text.translatable(Main.MOD_ID+".screen.preview.stop")
+            PREVIEW_STOP = Text.translatable(Main.MOD_ID+".screen.preview.stop"),
+            DROP_HINT = Text.translatable(Main.MOD_ID+".screen.drop_hint").formatted(Formatting.GRAY)
     ;
 
     private SongListWidget songListWidget;
@@ -70,6 +78,7 @@ public class DiscJockeyScreen extends Screen {
         addDrawableChild(previewButton);
 
         addDrawableChild(new ButtonWidget(width / 2 + 60, height - 61, 100, 20, Text.translatable(Main.MOD_ID+".screen.blocks"), button -> {
+            // TODO: 6/2/2022 Add an auto build mode
             if (BlocksOverlay.itemStacks == null) {
                 SongListWidget.SongEntry entry = songListWidget.getSelectedOrNull();
                 if (entry != null) {
@@ -115,12 +124,15 @@ public class DiscJockeyScreen extends Screen {
             shouldFilter = true;
         });
         addDrawableChild(searchBar);
+
+        // TODO: 6/2/2022 Add a reload button
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
 
+        drawCenteredText(matrices, textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
         drawCenteredText(matrices, textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
     }
 
@@ -145,6 +157,35 @@ public class DiscJockeyScreen extends Screen {
                 }
             }
         }
+    }
+
+    @Override
+    public void filesDragged(List<Path> paths) {
+        String string = paths.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
+        if (string.length() > 300) string = string.substring(0, 300)+"...";
+
+        client.setScreen(new ConfirmScreen(confirmed -> {
+            if (confirmed) {
+                paths.forEach(path -> {
+                    try {
+                        File file = path.toFile();
+
+                        if (SongLoader.SONGS.stream().anyMatch(input -> input.fileName.equalsIgnoreCase(file.getName()))) return;
+
+                        Song song = SongLoader.loadSong(file);
+                        if (song != null) {
+                            Files.copy(path, Main.songsFolder.toPath().resolve(file.getName()));
+                            SongLoader.SONGS.add(song);
+                        }
+                    } catch (IOException exception) {
+                        Main.LOGGER.warn("Failed to copy song file from {} to {}", path, Main.songsFolder.toPath(), exception);
+                    }
+                });
+
+                SongLoader.sort();
+            }
+            client.setScreen(this);
+        }, Text.translatable("disc_jockey.drop_confirm"), Text.literal(string)));
     }
 
     @Override

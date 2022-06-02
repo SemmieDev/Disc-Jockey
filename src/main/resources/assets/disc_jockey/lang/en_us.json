@@ -18,6 +18,7 @@
   "disc_jockey.song_not_found": " Song '%s' does not exist",
   "disc_jockey.not_playing": "Not playing any song",
   "disc_jockey.stopped_playing": "Stopped playing '%s'",
+  "disc_jockey.warning": "WARNING!!! This mod is very likely to get false flagged as hacks, please contact a server administrator before using this mod! (You can disable this warning in the mod settings)",
   "key.category.disc_jockey": "Disc Jockey",
   "disc_jockey.key_bind.open_screen": "Open song selection screen",
   "text.autoconfig.disc_jockey.title": "Disc Jockey",

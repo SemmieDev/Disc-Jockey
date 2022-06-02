@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 public class SongPlayer implements ClientTickEvents.StartWorldTick {
     private static final Box BOX = new Box(0, 0, 0, 1, 1, 1);
+    private static boolean warned;
 
     public boolean running;
     public Song song;
@@ -34,7 +35,11 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
     private int tuneDelay = 5;
 
     public void start(Song song) {
-        // TODO: 5/31/2022 State that this mod is bannable once each session
+        if (!Main.config.hideWarning && !warned) {
+            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.translatable("disc_jockey.warning").formatted(Formatting.BOLD, Formatting.RED));
+            warned = true;
+            return;
+        }
         if (running) stop();
         this.song = song;
         Main.TICK_LISTENERS.add(this);

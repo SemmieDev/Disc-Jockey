@@ -21,6 +21,9 @@
       "semmiedev.disc_jockey.ModMenuIntegration"
     ]
   },
+  "mixins": [
+    "disc_jockey.mixins.json"
+  ],
   "depends": {
     "fabric": "*",
     "minecraft": "1.19-beta.5"

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 @me.shedaniel.autoconfig.annotation.Config.Gui.Background("textures/block/note_block.png")
 public class Config implements ConfigData {
     public boolean hideWarning;
-    @ConfigEntry.Gui.Tooltip public boolean monoNoteBlocks;
+    @ConfigEntry.Gui.Excluded @ConfigEntry.Gui.Tooltip(count = 2) public boolean monoNoteBlocks;
 
     @ConfigEntry.Gui.Excluded
     public ArrayList<String> favorites = new ArrayList<>();

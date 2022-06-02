@@ -39,7 +39,6 @@ public class Main implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        // TODO: 5/31/2022 Add a note block mono mode, making all note block sounds play as mono instead of as stereo\
         configHolder = AutoConfig.register(Config.class, JanksonConfigSerializer::new);
         config = configHolder.getConfig();
 

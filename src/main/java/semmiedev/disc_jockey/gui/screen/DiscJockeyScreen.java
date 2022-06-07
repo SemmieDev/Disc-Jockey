@@ -185,7 +185,7 @@ public class DiscJockeyScreen extends Screen {
                 SongLoader.sort();
             }
             client.setScreen(this);
-        }, Text.translatable("disc_jockey.drop_confirm"), Text.literal(string)));
+        }, Text.translatable(Main.MOD_ID+".screen.drop_confirm"), Text.literal(string)));
     }
 
     @Override

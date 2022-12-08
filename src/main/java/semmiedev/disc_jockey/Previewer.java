@@ -30,7 +30,7 @@ public class Previewer implements ClientTickEvents.StartWorldTick {
         while (running) {
             long note = song.notes[i];
             if ((short)note == Math.round(tick)) {
-                world.playSoundFromEntity(MinecraftClient.getInstance().player, MinecraftClient.getInstance().player, Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)].getSound(), SoundCategory.RECORDS, 3, (float)Math.pow(2.0, ((byte)(note >> Note.NOTE_SHIFT) - 12) / 12.0));
+                world.playSoundFromEntity(MinecraftClient.getInstance().player, MinecraftClient.getInstance().player, Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)].getSound().value(), SoundCategory.RECORDS, 3, (float)Math.pow(2.0, ((byte)(note >> Note.NOTE_SHIFT) - 12) / 12.0));
                 i++;
                 if (i >= song.notes.length) {
                     stop();

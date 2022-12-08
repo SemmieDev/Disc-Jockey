@@ -54,7 +54,7 @@ public class DiscJockeyScreen extends Screen {
             if (song.entry.selected) songListWidget.setSelected(song.entry);
         }
 
-        playButton = new ButtonWidget(width / 2 - 160, height - 61, 100, 20, PLAY, button -> {
+        playButton = ButtonWidget.builder(PLAY, button -> {
             if (Main.SONG_PLAYER.running) {
                 Main.SONG_PLAYER.stop();
             } else {
@@ -64,20 +64,20 @@ public class DiscJockeyScreen extends Screen {
                     client.setScreen(null);
                 }
             }
-        });
+        }).dimensions(width / 2 - 160, height - 61, 100, 20).build();
         addDrawableChild(playButton);
 
-        previewButton = new ButtonWidget(width / 2 - 50, height - 61, 100, 20, PREVIEW, button -> {
+        previewButton = ButtonWidget.builder(PREVIEW, button -> {
             if (Main.PREVIEWER.running) {
                 Main.PREVIEWER.stop();
             } else {
                 SongListWidget.SongEntry entry = songListWidget.getSelectedOrNull();
                 if (entry != null) Main.PREVIEWER.start(entry.song);
             }
-        });
+        }).dimensions(width / 2 - 50, height - 61, 100, 20).build();
         addDrawableChild(previewButton);
 
-        addDrawableChild(new ButtonWidget(width / 2 + 60, height - 61, 100, 20, Text.translatable(Main.MOD_ID+".screen.blocks"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.translatable(Main.MOD_ID+".screen.blocks"), button -> {
             // TODO: 6/2/2022 Add an auto build mode
             if (BlocksOverlay.itemStacks == null) {
                 SongListWidget.SongEntry entry = songListWidget.getSelectedOrNull();
@@ -114,7 +114,7 @@ public class DiscJockeyScreen extends Screen {
                 BlocksOverlay.itemStacks = null;
                 client.setScreen(null);
             }
-        }));
+        }).dimensions(width / 2 + 60, height - 61, 100, 20).build());
 
         TextFieldWidget searchBar = new TextFieldWidget(textRenderer, width / 2 - 75, height - 31, 150, 20, Text.translatable(Main.MOD_ID+".screen.search"));
         searchBar.setChangedListener(query -> {

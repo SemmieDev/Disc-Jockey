@@ -132,8 +132,8 @@ public class DiscJockeyScreen extends Screen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);
 
-        drawCenteredText(matrices, textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
-        drawCenteredText(matrices, textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
+        drawCenteredTextWithShadow(matrices, textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
+        drawCenteredTextWithShadow(matrices, textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
     }
 
     @Override

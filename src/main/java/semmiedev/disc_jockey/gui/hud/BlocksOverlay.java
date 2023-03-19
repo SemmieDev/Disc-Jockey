@@ -26,11 +26,11 @@ public class BlocksOverlay {
             ItemRenderer itemRenderer = client.getItemRenderer();
 
             textRenderer.draw(matrices, " × "+amountOfNoteBlocks, 26, 13, 0xFFFFFF);
-            itemRenderer.renderInGui(NOTE_BLOCK, 6, 6);
+            itemRenderer.renderInGui(matrices, NOTE_BLOCK, 6, 6);
 
             for (int i = 0; i < itemStacks.length; i++) {
                 textRenderer.draw(matrices, " × "+amounts[i], 26, 13 + 20 * (i + 1), 0xFFFFFF);
-                itemRenderer.renderInGui(itemStacks[i], 6, 6 + 20 * (i + 1));
+                itemRenderer.renderInGui(matrices, itemStacks[i], 6, 6 + 20 * (i + 1));
             }
         }
     }

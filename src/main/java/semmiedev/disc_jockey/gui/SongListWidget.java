@@ -66,7 +66,7 @@ public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
                 fill(matrices, x + 1, y + 1, x + entryWidth - 1, y + entryHeight - 1, 0x000000);
             }
 
-            drawCenteredText(matrices, client.textRenderer, song.displayName, x + entryWidth / 2, y + 5, selected ? 0xFFFFFF : 0x808080);
+            drawCenteredTextWithShadow(matrices, client.textRenderer, song.displayName, x + entryWidth / 2, y + 5, selected ? 0xFFFFFF : 0x808080);
 
             RenderSystem.setShaderTexture(0, ICONS);
             drawTexture(matrices, x + 2, y + 2, (favorite ? 26 : 0) + (isOverFavoriteButton(mouseX, mouseY) ? 13 : 0), 0, 13, 12, 52, 12);

@@ -70,7 +70,8 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             for (int x = -7; x <= 7; x++) {
                 for (int y = -7; y <= 7; y++) {
                     for (int z = -7; z <= 7; z++) {
-                        BlockPos blockPos = new BlockPos(playerPos.add(x, y, z));
+                        Vec3d vec3d = playerPos.add(x, y, z);
+                        BlockPos blockPos = new BlockPos(MathHelper.floor(vec3d.x), MathHelper.floor(vec3d.y), MathHelper.floor(vec3d.z));
                         if (intersect(playerPos, MinecraftClient.getInstance().interactionManager.getReachDistance(), BOX.offset(blockPos))) {
                             BlockState blockState = world.getBlockState(blockPos);
                             if (blockState.isOf(Blocks.NOTE_BLOCK) && world.isAir(blockPos.up())) {

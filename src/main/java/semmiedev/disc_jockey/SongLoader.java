@@ -16,6 +16,7 @@ public class SongLoader {
     public static final ArrayList<Song> SONGS = new ArrayList<>();
     public static final ArrayList<String> SONG_SUGGESTIONS = new ArrayList<>();
     public static volatile boolean loadingSongs;
+    public static volatile boolean showToast;
 
     public static void loadSongs() {
         if (loadingSongs) return;
@@ -36,7 +37,8 @@ public class SongLoader {
             for (Song song : SONGS) SONG_SUGGESTIONS.add(song.displayName);
             Main.config.favorites.removeIf(favorite -> SongLoader.SONGS.stream().map(song -> song.fileName).noneMatch(favorite::equals));
 
-            if (MinecraftClient.getInstance().textRenderer != null) SystemToast.add(MinecraftClient.getInstance().getToastManager(), SystemToast.Type.PACK_LOAD_FAILURE, Main.NAME, Text.translatable(Main.MOD_ID+".loading_done"));
+            if (showToast && MinecraftClient.getInstance().textRenderer != null) SystemToast.add(MinecraftClient.getInstance().getToastManager(), SystemToast.Type.PACK_LOAD_FAILURE, Main.NAME, Text.translatable(Main.MOD_ID+".loading_done"));
+            showToast = true;
             loadingSongs = false;
         }).start();
     }

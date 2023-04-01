@@ -64,6 +64,7 @@ public class Main implements ClientModInitializer {
                 if (openScreenKeyBind.wasPressed()) {
                     if (SongLoader.loadingSongs) {
                         client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".still_loading").formatted(Formatting.RED));
+                        SongLoader.showToast = true;
                     } else {
                         client.setScreen(new DiscJockeyScreen());
                     }

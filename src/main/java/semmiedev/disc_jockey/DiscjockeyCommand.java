@@ -72,6 +72,7 @@ public class DiscjockeyCommand {
     private static boolean isLoading(CommandContext<FabricClientCommandSource> context) {
         if (SongLoader.loadingSongs) {
             context.getSource().sendError(Text.translatable(Main.MOD_ID+".still_loading"));
+            SongLoader.showToast = true;
             return true;
         }
         return false;

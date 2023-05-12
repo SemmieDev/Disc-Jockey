@@ -1,10 +1,10 @@
 package semmiedev.disc_jockey.gui.screen;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -129,11 +129,13 @@ public class DiscJockeyScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
 
-        drawCenteredTextWithShadow(matrices, textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
-        drawCenteredTextWithShadow(matrices, textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
+        //drawCenteredTextWithShadow(matrices, textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
+        //drawCenteredTextWithShadow(matrices, textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
     }
 
     @Override

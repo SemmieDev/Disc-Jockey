@@ -1,10 +1,9 @@
 package semmiedev.disc_jockey.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import semmiedev.disc_jockey.Main;
@@ -58,18 +57,22 @@ public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
         }
 
         @Override
-        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             this.x = x; this.y = y; this.entryWidth = entryWidth; this.entryHeight = entryHeight;
 
             if (selected) {
-                fill(matrices, x, y, x + entryWidth, y + entryHeight, 0xFFFFFF);
-                fill(matrices, x + 1, y + 1, x + entryWidth - 1, y + entryHeight - 1, 0x000000);
+                //fill(matrices, x, y, x + entryWidth, y + entryHeight, 0xFFFFFF);
+                context.fill(x, y, x + entryWidth, y + entryHeight, 0xFFFFFF);
+                //fill(matrices, x + 1, y + 1, x + entryWidth - 1, y + entryHeight - 1, 0x000000);
+                context.fill(x + 1, y + 1, x + entryWidth - 1, y + entryHeight - 1, 0x000000);
             }
 
-            drawCenteredTextWithShadow(matrices, client.textRenderer, song.displayName, x + entryWidth / 2, y + 5, selected ? 0xFFFFFF : 0x808080);
+            //drawCenteredTextWithShadow(matrices, client.textRenderer, song.displayName, x + entryWidth / 2, y + 5, selected ? 0xFFFFFF : 0x808080);
+            context.drawCenteredTextWithShadow(client.textRenderer, song.displayName, x + entryWidth / 2, y + 5, selected ? 0xFFFFFF : 0x808080);
 
-            RenderSystem.setShaderTexture(0, ICONS);
-            drawTexture(matrices, x + 2, y + 2, (favorite ? 26 : 0) + (isOverFavoriteButton(mouseX, mouseY) ? 13 : 0), 0, 13, 12, 52, 12);
+            //RenderSystem.setShaderTexture(0, ICONS);
+            //drawTexture(matrices, x + 2, y + 2, (favorite ? 26 : 0) + (isOverFavoriteButton(mouseX, mouseY) ? 13 : 0), 0, 13, 12, 52, 12);
+            context.drawTexture(ICONS, x + 2, y + 2, (favorite ? 26 : 0) + (isOverFavoriteButton(mouseX, mouseY) ? 13 : 0), 0, 13, 12, 52, 12);
         }
 
         @Override

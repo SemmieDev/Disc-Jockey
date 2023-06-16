@@ -34,7 +34,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
     private int index;
     private double tick; // Aka song position
     private HashMap<Instrument, HashMap<Byte, BlockPos>> noteBlocks = null;
-    private boolean tuned;
+    public boolean tuned;
     private long lastPlaybackTickAt = -1L;
 
     // Used to check and enforce packet rate limits to not get kicked

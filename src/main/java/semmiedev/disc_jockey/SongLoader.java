@@ -29,8 +29,8 @@ public class SongLoader {
                 Song song = null;
                 try {
                     song = loadSong(file);
-                } catch (IOException exception) {
-                    Main.LOGGER.error("Unable to read song "+file.getName(), exception);
+                } catch (Exception exception) {
+                    Main.LOGGER.error("Unable to read or parse song " + file.getName(), exception);
                 }
                 if (song != null) SONGS.add(song);
             }

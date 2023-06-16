@@ -414,7 +414,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             }
             if(lastBlockPos != null) {
                 // Turn head into spinning with time and lookup up further the further tuning is progressed
-                client.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(((float) (System.currentTimeMillis() % 2000)) * (360f/2000f), (1 - roughTuneProgress) * 180 - 90, true));
+                //client.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(((float) (System.currentTimeMillis() % 2000)) * (360f/2000f), (1 - roughTuneProgress) * 180 - 90, true));
                 client.player.swingHand(Hand.MAIN_HAND);
             }
         }

@@ -22,4 +22,22 @@ public class Song {
     public String toString() {
         return displayName;
     }
+
+    public double millisecondsToTicks(long milliseconds) {
+        // From NBS Format: The tempo of the song multiplied by 100 (for example, 1225 instead of 12.25). Measured in ticks per second.
+        double songSpeed = (tempo / 100.0) / 20.0; // 20 Ticks per second (temp / 100 = 20) would be 1x speed
+        double oneMsTo20TickFraction = 1.0 / 50.0;
+        return milliseconds * oneMsTo20TickFraction * songSpeed;
+    }
+
+    public double ticksToMilliseconds(double ticks) {
+        double songSpeed = (tempo / 100.0) / 20.0;
+        double oneMsTo20TickFraction = 1.0 / 50.0;
+        return ticks / oneMsTo20TickFraction / songSpeed;
+    }
+
+    public double getLengthInSeconds() {
+        return ticksToMilliseconds(length) / 1000.0;
+    }
+
 }

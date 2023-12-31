@@ -46,7 +46,7 @@ public class DiscJockeyScreen extends Screen {
     @Override
     protected void init() {
         shouldFilter = true;
-        songListWidget = new SongListWidget(client, width, height, 32, height - 64, 20);
+        songListWidget = new SongListWidget(client, width, height, 32, 20);
         addDrawableChild(songListWidget);
         for (int i = 0; i < SongLoader.SONGS.size(); i++) {
             Song song = SongLoader.SONGS.get(i);

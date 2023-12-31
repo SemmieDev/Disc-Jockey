@@ -11,6 +11,7 @@ import semmiedev.disc_jockey.Main;
 import semmiedev.disc_jockey.Song;
 
 public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
+
     public SongListWidget(MinecraftClient client, int width, int height, int top, int itemHeight) {
         super(client, width, height, top, itemHeight);
     }

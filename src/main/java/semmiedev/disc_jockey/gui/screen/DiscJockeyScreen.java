@@ -46,7 +46,7 @@ public class DiscJockeyScreen extends Screen {
     @Override
     protected void init() {
         shouldFilter = true;
-        songListWidget = new SongListWidget(client, width, height, 32, 20);
+        songListWidget = new SongListWidget(client, width, height - 64 - 32, 32, 20);
         addDrawableChild(songListWidget);
         for (int i = 0; i < SongLoader.SONGS.size(); i++) {
             Song song = SongLoader.SONGS.get(i);
@@ -130,11 +130,10 @@ public class DiscJockeyScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderBackgroundTexture(context);
         super.render(context, mouseX, mouseY, delta);
 
-        //drawCenteredTextWithShadow(matrices, textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
-        //drawCenteredTextWithShadow(matrices, textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
     }
 

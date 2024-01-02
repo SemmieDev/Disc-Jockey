@@ -1,5 +1,6 @@
 package semmiedev.disc_jockey.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -10,13 +11,9 @@ import semmiedev.disc_jockey.Main;
 import semmiedev.disc_jockey.Song;
 
 public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
-    public SongListWidget(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
-        super(client, width, height, top, bottom, itemHeight);
-    }
 
-    @Override
-    public void appendNarrations(NarrationMessageBuilder builder) {
-        // Who cares
+    public SongListWidget(MinecraftClient client, int width, int height, int top, int itemHeight) {
+        super(client, width, height, top, itemHeight);
     }
 
     @Override
@@ -35,6 +32,11 @@ public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
         if (selectedEntry != null) selectedEntry.selected = false;
         if (entry != null) entry.selected = true;
         super.setSelected(entry);
+    }
+
+    @Override
+    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        // Who cares
     }
 
     // TODO: 6/2/2022 Add a delete icon
@@ -61,17 +63,13 @@ public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
             this.x = x; this.y = y; this.entryWidth = entryWidth; this.entryHeight = entryHeight;
 
             if (selected) {
-                //fill(matrices, x, y, x + entryWidth, y + entryHeight, 0xFFFFFF);
                 context.fill(x, y, x + entryWidth, y + entryHeight, 0xFFFFFF);
-                //fill(matrices, x + 1, y + 1, x + entryWidth - 1, y + entryHeight - 1, 0x000000);
                 context.fill(x + 1, y + 1, x + entryWidth - 1, y + entryHeight - 1, 0x000000);
             }
 
-            //drawCenteredTextWithShadow(matrices, client.textRenderer, song.displayName, x + entryWidth / 2, y + 5, selected ? 0xFFFFFF : 0x808080);
             context.drawCenteredTextWithShadow(client.textRenderer, song.displayName, x + entryWidth / 2, y + 5, selected ? 0xFFFFFF : 0x808080);
 
-            //RenderSystem.setShaderTexture(0, ICONS);
-            //drawTexture(matrices, x + 2, y + 2, (favorite ? 26 : 0) + (isOverFavoriteButton(mouseX, mouseY) ? 13 : 0), 0, 13, 12, 52, 12);
+            RenderSystem.setShaderTexture(0, ICONS);
             context.drawTexture(ICONS, x + 2, y + 2, (favorite ? 26 : 0) + (isOverFavoriteButton(mouseX, mouseY) ? 13 : 0), 0, 13, 12, 52, 12);
         }
 

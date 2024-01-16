@@ -130,11 +130,15 @@ public class DiscJockeyScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackgroundTexture(context);
         super.render(context, mouseX, mouseY, delta);
 
         context.drawCenteredTextWithShadow(textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
+    }
+
+    @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderBackgroundTexture(context);
     }
 
     @Override

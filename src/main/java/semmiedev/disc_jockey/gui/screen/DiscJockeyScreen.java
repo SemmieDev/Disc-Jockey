@@ -138,7 +138,7 @@ public class DiscJockeyScreen extends Screen {
 
     @Override
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackgroundTexture(context);
+        renderBackground(context, mouseX, mouseY, delta);
     }
 
     @Override

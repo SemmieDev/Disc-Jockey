@@ -27,7 +27,7 @@
   ],
   "depends": {
     "fabric": "*",
-    "minecraft": "1.20.*",
+    "minecraft": "1.20.5-alpha.24.12.potato",
     "cloth-config": "*"
   }
 }

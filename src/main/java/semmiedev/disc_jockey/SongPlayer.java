@@ -327,7 +327,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             }
 
             if(lastInteractAt != -1L) {
-                // Paper allows 8 interacts per 300 ms
+                // Paper allows 8 interacts per 300 ms (actually 9 it turns out, but lets keep it a bit lower anyway)
                 availableInteracts += ((System.currentTimeMillis() - lastInteractAt) / (310.0 / 8.0));
                 availableInteracts = Math.min(8f, Math.max(0f, availableInteracts));
             }else {

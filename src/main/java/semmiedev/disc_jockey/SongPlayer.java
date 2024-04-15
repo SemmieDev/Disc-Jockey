@@ -150,7 +150,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 GameMode gameMode = client.interactionManager == null ? null : client.interactionManager.getCurrentGameMode();
                 // In the best case, gameMode would only be queried in sync Ticks, no here
                 if (gameMode == null || !gameMode.isSurvivalLike()) {
-                    client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.invalid_game_mode", gameMode.getTranslatableName()).formatted(Formatting.RED));
+                    client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.invalid_game_mode", gameMode == null ? "unknown" : gameMode.getTranslatableName()).formatted(Formatting.RED));
                     stop();
                     return;
                 }

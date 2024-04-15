@@ -67,6 +67,11 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
     public @NotNull HashMap<Instrument, Instrument> instrumentMap = new HashMap<>(); // Toy
     public synchronized void startPlaybackThread() {
+        if(Main.config.disableAsyncPlayback) {
+            playbackThread = null;
+            return;
+        }
+
         this.playbackThread = new Thread(() -> {
             Thread ownThread = this.playbackThread;
             while(ownThread == this.playbackThread) {
@@ -416,6 +421,14 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 // Turn head into spinning with time and lookup up further the further tuning is progressed
                 //client.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(((float) (System.currentTimeMillis() % 2000)) * (360f/2000f), (1 - roughTuneProgress) * 180 - 90, true));
                 client.player.swingHand(Hand.MAIN_HAND);
+            }
+        }else if((playbackThread == null || !playbackThread.isAlive()) && running && Main.config.disableAsyncPlayback) {
+            // Sync playback (off by default). Replacement for playback thread
+            try {
+                tickPlayback();
+            }catch (Exception ex) {
+                ex.printStackTrace();
+                stop();
             }
         }
     }

@@ -28,6 +28,9 @@
   "disc_jockey.key_bind.open_screen": "Open song selection screen",
   "text.autoconfig.disc_jockey.title": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.hideWarning": "Hide Warning",
+  "text.autoconfig.disc_jockey.option.disableAsyncPlayback": "Disable Async Playback",
+  "text.autoconfig.disc_jockey.option.disableAsyncPlayback.@Tooltip[0]": "Will force notes to play synchronously with client ticks instead of in a separate thread.",
+  "text.autoconfig.disc_jockey.option.disableAsyncPlayback.@Tooltip[1]": "This can lead to performance loss, especially when you client has low or inconsistent fps but can fix issues when playback does not happen at all.",
   "text.autoconfig.disc_jockey.option.monoNoteBlocks": "Non-Directional Note Block Sounds",
   "text.autoconfig.disc_jockey.option.monoNoteBlocks.@Tooltip[0]": "Makes all note block sounds when playing a song non-directional, creating a more pleasurable listening experience (clientside)",
   "text.autoconfig.disc_jockey.option.monoNoteBlocks.@Tooltip[1]": "If you don't know what that means, I recommend you just try it and hear the difference"

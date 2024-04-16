@@ -60,6 +60,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
     private int tuneInitialUntunedBlocks = -1;
     private HashMap<BlockPos, Pair<Integer, Long>> notePredictions = new HashMap<>();
     public boolean didSongReachEnd = false;
+    public boolean loopSong = false;
 
     public SongPlayer() {
         Main.TICK_LISTENERS.add(this);
@@ -205,6 +206,9 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                     if (index >= song.notes.length) {
                         stop();
                         didSongReachEnd = true;
+                        if(loopSong) {
+                            start(song);
+                        }
                         break;
                     }
                 } else {

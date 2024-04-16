@@ -214,7 +214,24 @@ public class DiscjockeyCommand {
                                 )
                         )
 
-
+                        .then(literal("loop")
+                                .executes(context -> {
+                                    context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".loop_status", Main.SONG_PLAYER.loopSong ? "yes" : "no"));
+                                    return 1;
+                                })
+                                .then(literal("yes")
+                                    .executes(context -> {
+                                        Main.SONG_PLAYER.loopSong = true;
+                                        context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".loop_enabled"));
+                                        return 1;
+                                    }))
+                                .then(literal("no")
+                                    .executes(context -> {
+                                        Main.SONG_PLAYER.loopSong = false;
+                                        context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".loop_disabled"));
+                                        return 1;
+                                    }))
+                        )
         );
     }
 

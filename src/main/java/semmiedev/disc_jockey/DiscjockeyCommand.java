@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.Nullable;
 import semmiedev.disc_jockey.gui.screen.DiscJockeyScreen;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class DiscjockeyCommand {
         }
         final ArrayList<String> instrumentNamesAndAll = new ArrayList<>(instrumentNames);
         instrumentNamesAndAll.add("all");
+        final ArrayList<String> instrumentNamesAndNothing = new ArrayList<>(instrumentNames);
+        instrumentNamesAndNothing.add("nothing");
 
         commandDispatcher.register(
                 literal("discjockey")
@@ -120,11 +123,11 @@ public class DiscjockeyCommand {
                                         .then(argument("originalInstrument", StringArgumentType.word())
                                                 .suggests((context, builder) -> CommandSource.suggestMatching(instrumentNamesAndAll, builder))
                                                 .then(argument("newInstrument", StringArgumentType.word())
-                                                        .suggests((context, builder) -> CommandSource.suggestMatching(instrumentNames, builder))
+                                                        .suggests((context, builder) -> CommandSource.suggestMatching(instrumentNamesAndNothing, builder))
                                                         .executes(context -> {
                                                             String originalInstrumentStr = StringArgumentType.getString(context, "originalInstrument");
                                                             String newInstrumentStr = StringArgumentType.getString(context, "newInstrument");
-                                                            Instrument originalInstrument = null, newInstrument = null;
+                                                            @Nullable Instrument originalInstrument = null, newInstrument = null;
                                                             for(Instrument maybeInstrument : Instrument.values()) {
                                                                 if(maybeInstrument.toString().equalsIgnoreCase(originalInstrumentStr)) {
                                                                     originalInstrument = maybeInstrument;
@@ -139,10 +142,13 @@ public class DiscjockeyCommand {
                                                                 return 0;
                                                             }
 
-                                                            if(newInstrument == null) {
+                                                            if(newInstrument == null && !newInstrumentStr.equalsIgnoreCase("nothing")) {
                                                                 context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".invalid_instrument", newInstrumentStr));
                                                                 return 0;
                                                             }
+
+                                                            // (originalInstrument == null) means: all instruments
+                                                            // (newInstrument == null) means: nothing (represented by null in hashmap, so no special handling below)
 
                                                             if(originalInstrument == null) {
                                                                 // All instruments
@@ -198,8 +204,8 @@ public class DiscjockeyCommand {
                                                 }
                                                 maps
                                                         .append(entry.getKey().toString().toLowerCase())
-                                                        .append(" -> ")
-                                                        .append(entry.getValue().toString().toLowerCase());
+                                                        .append("->")
+                                                        .append(entry.getValue() == null ? "nothing" : entry.getValue().toString().toLowerCase());
                                             }
                                             context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".mapped_instruments", maps.toString()));
                                             return 1;

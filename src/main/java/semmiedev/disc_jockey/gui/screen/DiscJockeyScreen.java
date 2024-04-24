@@ -89,7 +89,7 @@ public class DiscJockeyScreen extends Screen {
                     BlocksOverlay.amountOfNoteBlocks = entry.song.uniqueNotes.size();
 
                     for (Note note : entry.song.uniqueNotes) {
-                        ItemStack itemStack = Note.INSTRUMENT_BLOCKS.get(note.instrument).asItem().getDefaultStack();
+                        ItemStack itemStack = Note.INSTRUMENT_BLOCKS.get(note.instrument()).asItem().getDefaultStack();
                         int index = -1;
 
                         for (int i = 0; i < BlocksOverlay.itemStacks.length; i++) {
@@ -134,11 +134,6 @@ public class DiscJockeyScreen extends Screen {
 
         context.drawCenteredTextWithShadow(textRenderer, DROP_HINT, width / 2, 5, 0xFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer, SELECT_SONG, width / 2, 20, 0xFFFFFF);
-    }
-
-    @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackgroundTexture(context);
     }
 
     @Override

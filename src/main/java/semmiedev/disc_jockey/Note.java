@@ -6,14 +6,14 @@ import net.minecraft.block.enums.Instrument;
 
 import java.util.HashMap;
 
-public class Note {
+public record Note(Instrument instrument, byte note) {
     public static final HashMap<Instrument, Block> INSTRUMENT_BLOCKS = new HashMap<>();
 
     public static final byte LAYER_SHIFT = Short.SIZE;
     public static final byte INSTRUMENT_SHIFT = Short.SIZE * 2;
     public static final byte NOTE_SHIFT = Short.SIZE * 2 + Byte.SIZE;
 
-    public static final Instrument[] INSTRUMENTS = new Instrument[] {
+    public static final Instrument[] INSTRUMENTS = new Instrument[]{
             Instrument.HARP,
             Instrument.BASS,
             Instrument.BASEDRUM,
@@ -49,22 +49,5 @@ public class Note {
         INSTRUMENT_BLOCKS.put(Instrument.BIT, Blocks.EMERALD_BLOCK);
         INSTRUMENT_BLOCKS.put(Instrument.BANJO, Blocks.HAY_BLOCK);
         INSTRUMENT_BLOCKS.put(Instrument.PLING, Blocks.GLOWSTONE);
-    }
-
-    public final Instrument instrument;
-    public final byte note;
-
-    public Note(Instrument instrument, byte note) {
-        this.instrument = instrument;
-        this.note = note;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Note) {
-            Note note = (Note)obj;
-            return note.note == this.note && note.instrument == instrument;
-        }
-        return false;
     }
 }

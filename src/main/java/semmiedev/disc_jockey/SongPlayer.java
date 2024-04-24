@@ -297,17 +297,17 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             // Find fitting noteblocks with the least amount of adjustments required (to reduce tuning time)
             ArrayList<Note> capturedNotes = new ArrayList<>();
             for(Note note : song.uniqueNotes) {
-                ArrayList<BlockPos> availableBlocks = noteblocksForInstrument.get(note.instrument);
+                ArrayList<BlockPos> availableBlocks = noteblocksForInstrument.get(note.instrument());
                 if(availableBlocks == null) {
                     // Note was mapped to "nothing". Pretend it got captured, but just ignore it
                     capturedNotes.add(note);
-                    getNotes(note.instrument).put(note.note, null);
+                    getNotes(note.instrument()).put(note.note(), null);
                     continue;
                 }
                 BlockPos bestBlockPos = null;
                 int bestBlockTuningSteps = Integer.MAX_VALUE;
                 for(BlockPos blockPos : availableBlocks) {
-                    int wantedNote = note.note;
+                    int wantedNote = note.note();
                     int currentNote = client.world.getBlockState(blockPos).get(Properties.NOTE);
                     int tuningSteps = wantedNote >= currentNote ? wantedNote - currentNote : (25 - currentNote) + wantedNote;
 
@@ -320,7 +320,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 if(bestBlockPos != null) {
                     capturedNotes.add(note);
                     availableBlocks.remove(bestBlockPos);
-                    getNotes(note.instrument).put(note.note, bestBlockPos);
+                    getNotes(note.instrument()).put(note.note(), bestBlockPos);
                 } // else will be a missing note
             }
 
@@ -332,7 +332,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
                 HashMap<Block, Integer> missing = new HashMap<>();
                 for (Note note : missingNotes) {
-                    Instrument mappedInstrument = instrumentMap.getOrDefault(note.instrument, note.instrument);
+                    Instrument mappedInstrument = instrumentMap.getOrDefault(note.instrument(), note.instrument());
                     if(mappedInstrument == null) continue; // Ignore if mapped to nothing
                     Block block = Note.INSTRUMENT_BLOCKS.get(mappedInstrument);
                     Integer got = missing.get(block);
@@ -356,7 +356,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
             if(lastInteractAt != -1L) {
                 // Paper allows 8 interacts per 300 ms (actually 9 it turns out, but lets keep it a bit lower anyway)
-                availableInteracts += ((System.currentTimeMillis() - lastInteractAt) / (310.0 / 8.0));
+                availableInteracts += ((System.currentTimeMillis() - lastInteractAt) / (310.0f / 8.0f));
                 availableInteracts = Math.min(8f, Math.max(0f, availableInteracts));
             }else {
                 availableInteracts = 8f;
@@ -366,17 +366,17 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             int fullyTunedBlocks = 0;
             HashMap<BlockPos, Integer> untunedNotes = new HashMap<>();
             for (Note note : song.uniqueNotes) {
-                if(noteBlocks == null || noteBlocks.get(note.instrument) == null)
+                if(noteBlocks == null || noteBlocks.get(note.instrument()) == null)
                     continue;
-                BlockPos blockPos = noteBlocks.get(note.instrument).get(note.note);
+                BlockPos blockPos = noteBlocks.get(note.instrument()).get(note.note());
                 if(blockPos == null) continue;
                 BlockState blockState = world.getBlockState(blockPos);
                 int assumedNote = notePredictions.containsKey(blockPos) ? notePredictions.get(blockPos).getLeft() : blockState.get(Properties.NOTE);
 
                 if (blockState.contains(Properties.NOTE)) {
-                    if(assumedNote == note.note && blockState.get(Properties.NOTE) == note.note)
+                    if(assumedNote == note.note() && blockState.get(Properties.NOTE) == note.note())
                         fullyTunedBlocks++;
-                    if (assumedNote != note.note) {
+                    if (assumedNote != note.note()) {
                         if (!canInteractWith(client.player, blockPos)) {
                             stop();
                             client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
@@ -395,7 +395,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
             int existingUniqueNotesCount = 0;
             for(Note n : song.uniqueNotes) {
-                if(noteBlocks.get(n.instrument).get(n.note) != null)
+                if(noteBlocks.get(n.instrument()).get(n.note()) != null)
                     existingUniqueNotesCount++;
             }
 
@@ -445,7 +445,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 lastTunedNote = untunedNotes.get(blockPos);
                 untunedNotes.remove(blockPos);
                 int assumedNote = notePredictions.containsKey(blockPos) ? notePredictions.get(blockPos).getLeft() : client.world.getBlockState(blockPos).get(Properties.NOTE);
-                notePredictions.put(blockPos, new Pair((assumedNote + 1) % 25, System.currentTimeMillis() + ping * 2 + 100));
+                notePredictions.put(blockPos, new Pair<>((assumedNote + 1) % 25, System.currentTimeMillis() + ping * 2 + 100));
                 client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND, new BlockHitResult(Vec3d.of(blockPos), Direction.UP, blockPos, false));
                 lastInteractAt = System.currentTimeMillis();
                 availableInteracts -= 1f;

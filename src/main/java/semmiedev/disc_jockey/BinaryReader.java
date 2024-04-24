@@ -15,7 +15,7 @@ public class BinaryReader {
     }
 
     public int readInt() throws IOException {
-        return ((ByteBuffer)((ByteBuffer)buffer.clear()).put(readBytes(Integer.BYTES)).rewind()).getInt();
+        return buffer.clear().put(readBytes(Integer.BYTES)).rewind().getInt();
     }
 
     public long readUInt() throws IOException {
@@ -27,7 +27,7 @@ public class BinaryReader {
     }
 
     public short readShort() throws IOException {
-        return ((ByteBuffer)((ByteBuffer)buffer.clear()).put(readBytes(Short.BYTES)).rewind()).getShort();
+        return buffer.clear().put(readBytes(Short.BYTES)).rewind().getShort();
     }
 
     public String readString() throws IOException {
@@ -35,7 +35,7 @@ public class BinaryReader {
     }
 
     public float readFloat() throws IOException {
-        return ((ByteBuffer)((ByteBuffer)buffer.clear()).put(readBytes(Float.BYTES)).rewind()).getFloat();
+        return buffer.clear().put(readBytes(Float.BYTES)).rewind().getFloat();
     }
 
     /*private int getStringLength() throws IOException {

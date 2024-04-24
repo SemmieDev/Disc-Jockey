@@ -22,7 +22,7 @@ public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
     }
 
     @Override
-    protected int getScrollbarPositionX() {
+    protected int getScrollbarX() {
         return width - 12;
     }
 

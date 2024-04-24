@@ -18,7 +18,10 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -395,7 +398,6 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 if(noteBlocks.get(n.instrument).get(n.note) != null)
                     existingUniqueNotesCount++;
             }
-            System.out.println("existingUniqueNotesCount = " + existingUniqueNotesCount);
 
             if(untunedNotes.isEmpty() && fullyTunedBlocks == existingUniqueNotesCount) {
                 // Wait roundrip + 100ms before considering tuned after changing notes (in case the server rejects an interact)

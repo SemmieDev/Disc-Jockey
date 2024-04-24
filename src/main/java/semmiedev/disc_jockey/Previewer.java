@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.math.Vec3d;
 
 public class Previewer implements ClientTickEvents.StartWorldTick {
     public boolean running;
@@ -30,7 +31,8 @@ public class Previewer implements ClientTickEvents.StartWorldTick {
         while (running) {
             long note = song.notes[i];
             if ((short)note == Math.round(tick)) {
-                world.playSoundFromEntity(MinecraftClient.getInstance().player, MinecraftClient.getInstance().player, Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)].getSound().value(), SoundCategory.RECORDS, 3, (float)Math.pow(2.0, ((byte)(note >> Note.NOTE_SHIFT) - 12) / 12.0));
+                Vec3d pos = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
+                world.playSound(pos.x, pos.y, pos.z, Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)].getSound().value(), SoundCategory.RECORDS, 3, (float)Math.pow(2.0, ((byte)(note >> Note.NOTE_SHIFT) - 12) / 12.0), false);
                 i++;
                 if (i >= song.notes.length) {
                     stop();

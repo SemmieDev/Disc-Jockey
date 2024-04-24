@@ -8,14 +8,14 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
-// TODO: 6/1/2022 Make it actually mono
-public class MonoSoundInstance extends AbstractSoundInstance {
+public class OmnidirectionalSoundInstance extends AbstractSoundInstance {
     private final Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
 
-    public MonoSoundInstance(SoundEvent sound, SoundCategory category, float volume, float pitch, Random random) {
+    public OmnidirectionalSoundInstance(SoundEvent sound, SoundCategory category, float volume, float pitch, Random random) {
         super(sound, category, random);
         this.volume = volume;
         this.pitch = pitch;
+        this.attenuationType = AttenuationType.NONE;
     }
 
     @Override
@@ -34,6 +34,6 @@ public class MonoSoundInstance extends AbstractSoundInstance {
     }
 
     private Vec3d getPos() {
-        return camera.getPos().add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw()).multiply(0, 0, 1));
+        return camera.getPos();
     }
 }

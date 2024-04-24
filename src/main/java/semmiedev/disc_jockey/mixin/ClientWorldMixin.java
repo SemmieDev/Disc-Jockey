@@ -12,17 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import semmiedev.disc_jockey.Main;
-import semmiedev.disc_jockey.MonoSoundInstance;
+import semmiedev.disc_jockey.OmnidirectionalSoundInstance;
 
 @Mixin(ClientWorld.class)
 public class ClientWorldMixin {
     @Shadow @Final private MinecraftClient client;
 
     @Inject(method = "playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V", at = @At("HEAD"), cancellable = true)
-    private void makeNoteBlocksMono(double x, double y, double z, SoundEvent event, SoundCategory category, float volume, float pitch, boolean useDistance, long seed, CallbackInfo ci) {
-        if (Main.config.monoNoteBlocks && Main.SONG_PLAYER.running && event.getId().getPath().startsWith("block.note_block")) {
+    private void makeNoteBlockSoundsOmnidirectional(double x, double y, double z, SoundEvent event, SoundCategory category, float volume, float pitch, boolean useDistance, long seed, CallbackInfo ci) {
+        if (((Main.config.omnidirectionalNoteBlockSounds && Main.SONG_PLAYER.running) || Main.PREVIEWER.running) && event.getId().getPath().startsWith("block.note_block")) {
             ci.cancel();
-            client.getSoundManager().play(new MonoSoundInstance(event, category, volume, pitch, Random.create(seed)));
+            client.getSoundManager().play(new OmnidirectionalSoundInstance(event, category, volume, pitch, Random.create(seed)));
         }
     }
 }

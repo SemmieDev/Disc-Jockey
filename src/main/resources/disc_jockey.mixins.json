@@ -4,8 +4,7 @@
   "package": "semmiedev.disc_jockey.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ClientWorldMixin",
-    "SoundSystemMixin"
+    "ClientWorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1

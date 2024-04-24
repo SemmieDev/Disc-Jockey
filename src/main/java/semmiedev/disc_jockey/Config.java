@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Config implements ConfigData {
     public boolean hideWarning;
     @ConfigEntry.Gui.Tooltip(count = 2) public boolean disableAsyncPlayback;
-    @ConfigEntry.Gui.Tooltip(count = 2) public boolean omnidirectionalNoteBlockSounds;
+    @ConfigEntry.Gui.Tooltip(count = 2) public boolean omnidirectionalNoteBlockSounds = true;
 
     @ConfigEntry.Gui.Excluded
     public ArrayList<String> favorites = new ArrayList<>();

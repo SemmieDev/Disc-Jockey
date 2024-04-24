@@ -21,6 +21,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,13 +61,19 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
     private int tuneInitialUntunedBlocks = -1;
     private HashMap<BlockPos, Pair<Integer, Long>> notePredictions = new HashMap<>();
     public boolean didSongReachEnd = false;
+    public boolean loopSong = false;
 
     public SongPlayer() {
         Main.TICK_LISTENERS.add(this);
     }
 
-    public @NotNull HashMap<Instrument, Instrument> instrumentMap = new HashMap<>(); // Toy
+    public @NotNull HashMap<Instrument, @Nullable Instrument> instrumentMap = new HashMap<>(); // Toy
     public synchronized void startPlaybackThread() {
+        if(Main.config.disableAsyncPlayback) {
+            playbackThread = null;
+            return;
+        }
+
         this.playbackThread = new Thread(() -> {
             Thread ownThread = this.playbackThread;
             while(ownThread == this.playbackThread) {
@@ -150,7 +157,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 GameMode gameMode = client.interactionManager == null ? null : client.interactionManager.getCurrentGameMode();
                 // In the best case, gameMode would only be queried in sync Ticks, no here
                 if (gameMode == null || !gameMode.isSurvivalLike()) {
-                    client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.invalid_game_mode", gameMode.getTranslatableName()).formatted(Formatting.RED));
+                    client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.invalid_game_mode", gameMode == null ? "unknown" : gameMode.getTranslatableName()).formatted(Formatting.RED));
                     stop();
                     return;
                 }
@@ -158,7 +165,12 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 long note = song.notes[index];
                 final long now = System.currentTimeMillis();
                 if ((short)note <= Math.round(tick)) {
-                    BlockPos blockPos = noteBlocks.get(Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)]).get((byte)(note >> Note.NOTE_SHIFT));
+                    @Nullable BlockPos blockPos = noteBlocks.get(Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)]).get((byte)(note >> Note.NOTE_SHIFT));
+                    if(blockPos == null) {
+                        // Instrument got likely mapped to "nothing". Skip it
+                        index++;
+                        continue;
+                    }
                     if (!canInteractWith(client.player, blockPos)) {
                         stop();
                         client.inGameHud.getChatHud().addMessage(Text.translatable(Main.MOD_ID+".player.to_far").formatted(Formatting.RED));
@@ -200,6 +212,9 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                     if (index >= song.notes.length) {
                         stop();
                         didSongReachEnd = true;
+                        if(loopSong) {
+                            start(song);
+                        }
                         break;
                     }
                 } else {
@@ -264,6 +279,13 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             if(!instrumentMap.isEmpty()) {
                 HashMap<Instrument, ArrayList<BlockPos>> newNoteblocksForInstrument = new HashMap<>();
                 for(Instrument orig : noteblocksForInstrument.keySet()) {
+                    Instrument mappedInstrument = instrumentMap.getOrDefault(orig, orig);
+                    if(mappedInstrument == null) {
+                        // Instrument got likely mapped to "nothing"
+                        newNoteblocksForInstrument.put(orig, null);
+                        continue;
+                    }
+
                     newNoteblocksForInstrument.put(orig, noteblocksForInstrument.getOrDefault(instrumentMap.getOrDefault(orig, orig), new ArrayList<>()));
                 }
                 noteblocksForInstrument = newNoteblocksForInstrument;
@@ -273,6 +295,12 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             ArrayList<Note> capturedNotes = new ArrayList<>();
             for(Note note : song.uniqueNotes) {
                 ArrayList<BlockPos> availableBlocks = noteblocksForInstrument.get(note.instrument);
+                if(availableBlocks == null) {
+                    // Note was mapped to "nothing". Pretend it got captured, but just ignore it
+                    capturedNotes.add(note);
+                    getNotes(note.instrument).put(note.note, null);
+                    continue;
+                }
                 BlockPos bestBlockPos = null;
                 int bestBlockTuningSteps = Integer.MAX_VALUE;
                 for(BlockPos blockPos : availableBlocks) {
@@ -301,7 +329,9 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
                 HashMap<Block, Integer> missing = new HashMap<>();
                 for (Note note : missingNotes) {
-                    Block block = Note.INSTRUMENT_BLOCKS.get(instrumentMap.getOrDefault(note.instrument, note.instrument));
+                    Instrument mappedInstrument = instrumentMap.getOrDefault(note.instrument, note.instrument);
+                    if(mappedInstrument == null) continue; // Ignore if mapped to nothing
+                    Block block = Note.INSTRUMENT_BLOCKS.get(mappedInstrument);
                     Integer got = missing.get(block);
                     if (got == null) got = 0;
                     missing.put(block, got + 1);
@@ -322,7 +352,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             }
 
             if(lastInteractAt != -1L) {
-                // Paper allows 8 interacts per 300 ms
+                // Paper allows 8 interacts per 300 ms (actually 9 it turns out, but lets keep it a bit lower anyway)
                 availableInteracts += ((System.currentTimeMillis() - lastInteractAt) / (310.0 / 8.0));
                 availableInteracts = Math.min(8f, Math.max(0f, availableInteracts));
             }else {
@@ -360,7 +390,14 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             if(tuneInitialUntunedBlocks == -1 || tuneInitialUntunedBlocks < untunedNotes.size())
                 tuneInitialUntunedBlocks = untunedNotes.size();
 
-            if(untunedNotes.isEmpty() && fullyTunedBlocks == song.uniqueNotes.size()) {
+            int existingUniqueNotesCount = 0;
+            for(Note n : song.uniqueNotes) {
+                if(noteBlocks.get(n.instrument).get(n.note) != null)
+                    existingUniqueNotesCount++;
+            }
+            System.out.println("existingUniqueNotesCount = " + existingUniqueNotesCount);
+
+            if(untunedNotes.isEmpty() && fullyTunedBlocks == existingUniqueNotesCount) {
                 // Wait roundrip + 100ms before considering tuned after changing notes (in case the server rejects an interact)
                 if(lastInteractAt == -1 || System.currentTimeMillis() - lastInteractAt >= ping * 2 + 100) {
                     tuned = true;
@@ -416,6 +453,14 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 // Turn head into spinning with time and lookup up further the further tuning is progressed
                 //client.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(((float) (System.currentTimeMillis() % 2000)) * (360f/2000f), (1 - roughTuneProgress) * 180 - 90, true));
                 client.player.swingHand(Hand.MAIN_HAND);
+            }
+        }else if((playbackThread == null || !playbackThread.isAlive()) && running && Main.config.disableAsyncPlayback) {
+            // Sync playback (off by default). Replacement for playback thread
+            try {
+                tickPlayback();
+            }catch (Exception ex) {
+                ex.printStackTrace();
+                stop();
             }
         }
     }

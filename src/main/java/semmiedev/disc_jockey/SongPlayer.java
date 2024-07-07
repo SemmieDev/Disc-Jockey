@@ -18,11 +18,9 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.GameMode;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -473,7 +471,20 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
     // The server limits interacts to 6 Blocks from Player Eye to Block Center
     private boolean canInteractWith(ClientPlayerEntity player, BlockPos blockPos) {
-        return player.getEyePos().squaredDistanceTo(new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5)) <= 6.0*6.0;
+        final Vec3d eyePos = player.getEyePos();
+        if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_4_Or_Earlier) {
+            return eyePos.squaredDistanceTo(blockPos.toCenterPos()) <= 6.0 * 6.0;
+        }else if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_5_Or_Later) {
+            double blockInteractRange = player.getBlockInteractionRange() + 1.0;
+            return new Box(blockPos).squaredMagnitude(eyePos) < blockInteractRange * blockInteractRange;
+        }else if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.All) {
+            // Require both checks to succeed (aka use worst distance)
+            double blockInteractRange = player.getBlockInteractionRange() + 1.0;
+            return eyePos.squaredDistanceTo(blockPos.toCenterPos()) <= 6.0 * 6.0
+                    && new Box(blockPos).squaredMagnitude(eyePos) < blockInteractRange * blockInteractRange;
+        }else {
+            throw new NotImplementedException("ExpectedServerVersion Value not implemented: " + Main.config.expectedServerVersion.name());
+        }
     }
 
     public double getSongElapsedSeconds() {

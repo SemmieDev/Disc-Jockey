@@ -44,5 +44,10 @@
   "text.autoconfig.disc_jockey.option.disableAsyncPlayback.@Tooltip[1]": "This can lead to performance loss, especially when you client has low or inconsistent fps but can fix issues when playback does not happen at all.",
   "text.autoconfig.disc_jockey.option.omnidirectionalNoteBlockSounds": "Omnidirectional Note Block Sounds (clientside)",
   "text.autoconfig.disc_jockey.option.omnidirectionalNoteBlockSounds.@Tooltip[0]": "Makes all note block sounds when playing a song omnidirectional, creating a more pleasing listening experience",
-  "text.autoconfig.disc_jockey.option.omnidirectionalNoteBlockSounds.@Tooltip[1]": "If you don't know what that means, I recommend you just try it and hear the difference"
+  "text.autoconfig.disc_jockey.option.omnidirectionalNoteBlockSounds.@Tooltip[1]": "If you don't know what that means, I recommend you just try it and hear the difference",
+  "text.autoconfig.disc_jockey.option.expectedServerVersion": "Expected Server Version",
+  "text.autoconfig.disc_jockey.option.expectedServerVersion.@Tooltip[0]": "Select the server version, you expect this mod to be used on.",
+  "text.autoconfig.disc_jockey.option.expectedServerVersion.@Tooltip[1]": "This affects how reachable NoteBlocks are determined.",
+  "text.autoconfig.disc_jockey.option.expectedServerVersion.@Tooltip[2]": "Selecting the wrong version could cause you not to be able to play some distant note blocks which could break/worsen playback",
+  "text.autoconfig.disc_jockey.option.expectedServerVersion.@Tooltip[3]": "If you're unsure, or play on many different server versions and don't mind not reaching every possible note block, select \"All\""
 }

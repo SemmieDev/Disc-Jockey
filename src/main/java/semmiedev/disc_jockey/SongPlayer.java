@@ -255,13 +255,29 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             HashMap<Instrument, ArrayList<BlockPos>> noteblocksForInstrument = new HashMap<>();
             for(Instrument instrument : Instrument.values())
                 noteblocksForInstrument.put(instrument, new ArrayList<>());
-            final Vec3d playerPos = player.getEyePos();
-            final int[] orderedOffsets = new int[] { 0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5, -6, 6, -7, 7 };
+            final Vec3d playerEyePos = player.getEyePos();
+
+            final int maxOffset; // Rough estimates, of which blocks could be in reach
+            if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_4_Or_Earlier) {
+                maxOffset = 7;
+            }else if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_5_Or_Later) {
+                maxOffset = (int) Math.ceil(player.getBlockInteractionRange() + 1.0 + 1.0);
+            }else if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.All) {
+                maxOffset = Math.min(7, (int) Math.ceil(player.getBlockInteractionRange() + 1.0 + 1.0));
+            }else {
+                throw new NotImplementedException("ExpectedServerVersion Value not implemented: " + Main.config.expectedServerVersion.name());
+            }
+            final ArrayList<Integer> orderedOffsets = new ArrayList<>();
+            for(int offset = 0; offset <= maxOffset; offset++) {
+                orderedOffsets.add(offset);
+                if(offset != 0) orderedOffsets.add(offset * -1);
+            }
+
             for(Instrument instrument : noteblocksForInstrument.keySet().toArray(new Instrument[0])) {
                 for (int y : orderedOffsets) {
                     for (int x : orderedOffsets) {
                         for (int z : orderedOffsets) {
-                            Vec3d vec3d = playerPos.add(x, y, z);
+                            Vec3d vec3d = playerEyePos.add(x, y, z);
                             BlockPos blockPos = new BlockPos(MathHelper.floor(vec3d.x), MathHelper.floor(vec3d.y), MathHelper.floor(vec3d.z));
                             if (!canInteractWith(player, blockPos))
                                 continue;

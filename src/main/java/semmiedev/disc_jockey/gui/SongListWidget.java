@@ -41,7 +41,7 @@ public class SongListWidget extends EntryListWidget<SongListWidget.SongEntry> {
 
     // TODO: 6/2/2022 Add a delete icon
     public static class SongEntry extends Entry<SongEntry> {
-        private static final Identifier ICONS = new Identifier(Main.MOD_ID, "textures/gui/icons.png");
+        private static final Identifier ICONS = Identifier.of(Main.MOD_ID, "textures/gui/icons.png");
 
         public final int index;
         public final Song song;

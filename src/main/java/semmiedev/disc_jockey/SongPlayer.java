@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.enums.Instrument;
+import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -35,7 +35,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
     private int index;
     private double tick; // Aka song position
-    private HashMap<Instrument, HashMap<Byte, BlockPos>> noteBlocks = null;
+    private HashMap<NoteBlockInstrument, HashMap<Byte, BlockPos>> noteBlocks = null;
     public boolean tuned;
     private long lastPlaybackTickAt = -1L;
 
@@ -69,7 +69,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
         Main.TICK_LISTENERS.add(this);
     }
 
-    public @NotNull HashMap<Instrument, @Nullable Instrument> instrumentMap = new HashMap<>(); // Toy
+    public @NotNull HashMap<NoteBlockInstrument, @Nullable NoteBlockInstrument> instrumentMap = new HashMap<>(); // Toy
     public synchronized void startPlaybackThread() {
         if(Main.config.disableAsyncPlayback) {
             playbackThread = null;
@@ -254,8 +254,8 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             ClientPlayerEntity player = client.player;
 
             // Create list of available noteblock positions per used instrument
-            HashMap<Instrument, ArrayList<BlockPos>> noteblocksForInstrument = new HashMap<>();
-            for(Instrument instrument : Instrument.values())
+            HashMap<NoteBlockInstrument, ArrayList<BlockPos>> noteblocksForInstrument = new HashMap<>();
+            for(NoteBlockInstrument instrument : NoteBlockInstrument.values())
                 noteblocksForInstrument.put(instrument, new ArrayList<>());
             final Vec3d playerEyePos = player.getEyePos();
 
@@ -275,7 +275,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 if(offset != 0) orderedOffsets.add(offset * -1);
             }
 
-            for(Instrument instrument : noteblocksForInstrument.keySet().toArray(new Instrument[0])) {
+            for(NoteBlockInstrument instrument : noteblocksForInstrument.keySet().toArray(new NoteBlockInstrument[0])) {
                 for (int y : orderedOffsets) {
                     for (int x : orderedOffsets) {
                         for (int z : orderedOffsets) {
@@ -296,9 +296,9 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
             // Remap instruments for funzies
             if(!instrumentMap.isEmpty()) {
-                HashMap<Instrument, ArrayList<BlockPos>> newNoteblocksForInstrument = new HashMap<>();
-                for(Instrument orig : noteblocksForInstrument.keySet()) {
-                    Instrument mappedInstrument = instrumentMap.getOrDefault(orig, orig);
+                HashMap<NoteBlockInstrument, ArrayList<BlockPos>> newNoteblocksForInstrument = new HashMap<>();
+                for(NoteBlockInstrument orig : noteblocksForInstrument.keySet()) {
+                    NoteBlockInstrument mappedInstrument = instrumentMap.getOrDefault(orig, orig);
                     if(mappedInstrument == null) {
                         // Instrument got likely mapped to "nothing"
                         newNoteblocksForInstrument.put(orig, null);
@@ -348,7 +348,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
                 HashMap<Block, Integer> missing = new HashMap<>();
                 for (Note note : missingNotes) {
-                    Instrument mappedInstrument = instrumentMap.getOrDefault(note.instrument(), note.instrument());
+                    NoteBlockInstrument mappedInstrument = instrumentMap.getOrDefault(note.instrument(), note.instrument());
                     if(mappedInstrument == null) continue; // Ignore if mapped to nothing
                     Block block = Note.INSTRUMENT_BLOCKS.get(mappedInstrument);
                     Integer got = missing.get(block);
@@ -485,11 +485,13 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
         }
     }
 
-    private HashMap<Byte, BlockPos> getNotes(Instrument instrument) {
+    private HashMap<Byte, BlockPos> getNotes(NoteBlockInstrument instrument) {
         return noteBlocks.computeIfAbsent(instrument, k -> new HashMap<>());
     }
 
-    // The server limits interacts to 6 Blocks from Player Eye to Block Center
+    // Before 1.20.5, the server limits interacts to 6 Blocks from Player Eye to Block Center
+    // With 1.20.5 and later, the server does a more complex check, to the closest point of a full block hitbox
+    // (max distance is BlockInteractRange + 1.0).
     private boolean canInteractWith(ClientPlayerEntity player, BlockPos blockPos) {
         final Vec3d eyePos = player.getEyePos();
         if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_4_Or_Earlier) {

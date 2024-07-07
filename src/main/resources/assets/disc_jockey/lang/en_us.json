@@ -49,5 +49,7 @@
   "text.autoconfig.disc_jockey.option.expectedServerVersion.@Tooltip[0]": "Select the server version, you expect this mod to be used on.",
   "text.autoconfig.disc_jockey.option.expectedServerVersion.@Tooltip[1]": "This affects how reachable NoteBlocks are determined.",
   "text.autoconfig.disc_jockey.option.expectedServerVersion.@Tooltip[2]": "Selecting the wrong version could cause you not to be able to play some distant note blocks which could break/worsen playback",
-  "text.autoconfig.disc_jockey.option.expectedServerVersion.@Tooltip[3]": "If you're unsure, or play on many different server versions and don't mind not reaching every possible note block, select \"All\""
+  "text.autoconfig.disc_jockey.option.expectedServerVersion.@Tooltip[3]": "If you're unsure, or play on many different server versions and don't mind not reaching every possible note block, select \"All\"",
+  "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Delay playback by (seconds)",
+  "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs.@Tooltip": "Delays playback for specified seconds, after tuning finished, if any (e.g. 0.5 for half a second delay)."
 }

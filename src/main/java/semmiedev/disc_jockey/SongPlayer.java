@@ -63,6 +63,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
     private HashMap<BlockPos, Pair<Integer, Long>> notePredictions = new HashMap<>();
     public boolean didSongReachEnd = false;
     public boolean loopSong = false;
+    private long pausePlaybackUntil = -1L; // Set after tuning, if configured
 
     public SongPlayer() {
         Main.TICK_LISTENERS.add(this);
@@ -153,6 +154,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             last100MsSpanEstimatedPackets = 0;
         }
         if(noteBlocks != null && tuned) {
+            if(pausePlaybackUntil != -1L && System.currentTimeMillis() <= pausePlaybackUntil) return;
             while (running) {
                 MinecraftClient client = MinecraftClient.getInstance();
                 GameMode gameMode = client.interactionManager == null ? null : client.interactionManager.getCurrentGameMode();
@@ -417,7 +419,9 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 // Wait roundrip + 100ms before considering tuned after changing notes (in case the server rejects an interact)
                 if(lastInteractAt == -1 || System.currentTimeMillis() - lastInteractAt >= ping * 2 + 100) {
                     tuned = true;
+                    pausePlaybackUntil = System.currentTimeMillis() + (long) (Math.abs(Main.config.delayPlaybackStartBySecs) * 1000);
                     tuneInitialUntunedBlocks = -1;
+                    // Tuning finished
                 }
             }
 

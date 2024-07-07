@@ -35,6 +35,9 @@ public class Config implements ConfigData {
     @ConfigEntry.Gui.Tooltip(count = 4)
     public ExpectedServerVersion expectedServerVersion = ExpectedServerVersion.All;
 
+    @ConfigEntry.Gui.Tooltip(count = 1)
+    public float delayPlaybackStartBySecs = 0.0f;
+
     @ConfigEntry.Gui.Excluded
     public ArrayList<String> favorites = new ArrayList<>();
 }

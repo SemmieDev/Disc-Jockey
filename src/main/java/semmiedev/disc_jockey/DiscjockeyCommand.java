@@ -5,11 +5,10 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.block.enums.Instrument;
+import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 import semmiedev.disc_jockey.gui.screen.DiscJockeyScreen;
 
@@ -26,7 +25,7 @@ public class DiscjockeyCommand {
 
     public static void register(CommandDispatcher<FabricClientCommandSource> commandDispatcher) {
         final ArrayList<String> instrumentNames = new ArrayList<>();
-        for (Instrument instrument : Instrument.values()) {
+        for (NoteBlockInstrument instrument : NoteBlockInstrument.values()) {
             instrumentNames.add(instrument.toString().toLowerCase());
         }
         final ArrayList<String> instrumentNamesAndAll = new ArrayList<>(instrumentNames);
@@ -127,8 +126,8 @@ public class DiscjockeyCommand {
                                                         .executes(context -> {
                                                             String originalInstrumentStr = StringArgumentType.getString(context, "originalInstrument");
                                                             String newInstrumentStr = StringArgumentType.getString(context, "newInstrument");
-                                                            @Nullable Instrument originalInstrument = null, newInstrument = null;
-                                                            for(Instrument maybeInstrument : Instrument.values()) {
+                                                            @Nullable NoteBlockInstrument originalInstrument = null, newInstrument = null;
+                                                            for(NoteBlockInstrument maybeInstrument : NoteBlockInstrument.values()) {
                                                                 if(maybeInstrument.toString().equalsIgnoreCase(originalInstrumentStr)) {
                                                                     originalInstrument = maybeInstrument;
                                                                 }
@@ -152,7 +151,7 @@ public class DiscjockeyCommand {
 
                                                             if(originalInstrument == null) {
                                                                 // All instruments
-                                                                for(Instrument instrument : Instrument.values()) {
+                                                                for(NoteBlockInstrument instrument : NoteBlockInstrument.values()) {
                                                                     Main.SONG_PLAYER.instrumentMap.put(instrument, newInstrument);
                                                                 }
                                                                 context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".instrument_mapped_all", newInstrumentStr.toLowerCase()));
@@ -171,8 +170,8 @@ public class DiscjockeyCommand {
                                                 .executes(context -> {
                                                     String instrumentStr = StringArgumentType.getString(context, "instrument");
 
-                                                    Instrument instrument = null;
-                                                    for(Instrument maybeInstrument : Instrument.values()) {
+                                                    NoteBlockInstrument instrument = null;
+                                                    for(NoteBlockInstrument maybeInstrument : NoteBlockInstrument.values()) {
                                                         if(maybeInstrument.toString().equalsIgnoreCase(instrumentStr)) {
                                                             instrument = maybeInstrument;
                                                             break;
@@ -198,7 +197,7 @@ public class DiscjockeyCommand {
                                             }
 
                                             StringBuilder maps = new StringBuilder();
-                                            for(Map.Entry<Instrument, Instrument> entry : Main.SONG_PLAYER.instrumentMap.entrySet()) {
+                                            for(Map.Entry<NoteBlockInstrument, NoteBlockInstrument> entry : Main.SONG_PLAYER.instrumentMap.entrySet()) {
                                                 if(maps.length() > 0) {
                                                     maps.append(", ");
                                                 }

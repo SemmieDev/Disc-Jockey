@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.enums.Instrument;
+import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -18,11 +18,9 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.GameMode;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +35,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
     private int index;
     private double tick; // Aka song position
-    private HashMap<Instrument, HashMap<Byte, BlockPos>> noteBlocks = null;
+    private HashMap<NoteBlockInstrument, HashMap<Byte, BlockPos>> noteBlocks = null;
     public boolean tuned;
     private long lastPlaybackTickAt = -1L;
 
@@ -65,12 +63,13 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
     private HashMap<BlockPos, Pair<Integer, Long>> notePredictions = new HashMap<>();
     public boolean didSongReachEnd = false;
     public boolean loopSong = false;
+    private long pausePlaybackUntil = -1L; // Set after tuning, if configured
 
     public SongPlayer() {
         Main.TICK_LISTENERS.add(this);
     }
 
-    public @NotNull HashMap<Instrument, @Nullable Instrument> instrumentMap = new HashMap<>(); // Toy
+    public @NotNull HashMap<NoteBlockInstrument, @Nullable NoteBlockInstrument> instrumentMap = new HashMap<>(); // Toy
     public synchronized void startPlaybackThread() {
         if(Main.config.disableAsyncPlayback) {
             playbackThread = null;
@@ -155,6 +154,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             last100MsSpanEstimatedPackets = 0;
         }
         if(noteBlocks != null && tuned) {
+            if(pausePlaybackUntil != -1L && System.currentTimeMillis() <= pausePlaybackUntil) return;
             while (running) {
                 MinecraftClient client = MinecraftClient.getInstance();
                 GameMode gameMode = client.interactionManager == null ? null : client.interactionManager.getCurrentGameMode();
@@ -254,16 +254,32 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
             ClientPlayerEntity player = client.player;
 
             // Create list of available noteblock positions per used instrument
-            HashMap<Instrument, ArrayList<BlockPos>> noteblocksForInstrument = new HashMap<>();
-            for(Instrument instrument : Instrument.values())
+            HashMap<NoteBlockInstrument, ArrayList<BlockPos>> noteblocksForInstrument = new HashMap<>();
+            for(NoteBlockInstrument instrument : NoteBlockInstrument.values())
                 noteblocksForInstrument.put(instrument, new ArrayList<>());
-            final Vec3d playerPos = player.getEyePos();
-            final int[] orderedOffsets = new int[] { 0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5, -6, 6, -7, 7 };
-            for(Instrument instrument : noteblocksForInstrument.keySet().toArray(new Instrument[0])) {
+            final Vec3d playerEyePos = player.getEyePos();
+
+            final int maxOffset; // Rough estimates, of which blocks could be in reach
+            if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_4_Or_Earlier) {
+                maxOffset = 7;
+            }else if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_5_Or_Later) {
+                maxOffset = (int) Math.ceil(player.getBlockInteractionRange() + 1.0 + 1.0);
+            }else if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.All) {
+                maxOffset = Math.min(7, (int) Math.ceil(player.getBlockInteractionRange() + 1.0 + 1.0));
+            }else {
+                throw new NotImplementedException("ExpectedServerVersion Value not implemented: " + Main.config.expectedServerVersion.name());
+            }
+            final ArrayList<Integer> orderedOffsets = new ArrayList<>();
+            for(int offset = 0; offset <= maxOffset; offset++) {
+                orderedOffsets.add(offset);
+                if(offset != 0) orderedOffsets.add(offset * -1);
+            }
+
+            for(NoteBlockInstrument instrument : noteblocksForInstrument.keySet().toArray(new NoteBlockInstrument[0])) {
                 for (int y : orderedOffsets) {
                     for (int x : orderedOffsets) {
                         for (int z : orderedOffsets) {
-                            Vec3d vec3d = playerPos.add(x, y, z);
+                            Vec3d vec3d = playerEyePos.add(x, y, z);
                             BlockPos blockPos = new BlockPos(MathHelper.floor(vec3d.x), MathHelper.floor(vec3d.y), MathHelper.floor(vec3d.z));
                             if (!canInteractWith(player, blockPos))
                                 continue;
@@ -280,9 +296,9 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
             // Remap instruments for funzies
             if(!instrumentMap.isEmpty()) {
-                HashMap<Instrument, ArrayList<BlockPos>> newNoteblocksForInstrument = new HashMap<>();
-                for(Instrument orig : noteblocksForInstrument.keySet()) {
-                    Instrument mappedInstrument = instrumentMap.getOrDefault(orig, orig);
+                HashMap<NoteBlockInstrument, ArrayList<BlockPos>> newNoteblocksForInstrument = new HashMap<>();
+                for(NoteBlockInstrument orig : noteblocksForInstrument.keySet()) {
+                    NoteBlockInstrument mappedInstrument = instrumentMap.getOrDefault(orig, orig);
                     if(mappedInstrument == null) {
                         // Instrument got likely mapped to "nothing"
                         newNoteblocksForInstrument.put(orig, null);
@@ -332,7 +348,7 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
 
                 HashMap<Block, Integer> missing = new HashMap<>();
                 for (Note note : missingNotes) {
-                    Instrument mappedInstrument = instrumentMap.getOrDefault(note.instrument(), note.instrument());
+                    NoteBlockInstrument mappedInstrument = instrumentMap.getOrDefault(note.instrument(), note.instrument());
                     if(mappedInstrument == null) continue; // Ignore if mapped to nothing
                     Block block = Note.INSTRUMENT_BLOCKS.get(mappedInstrument);
                     Integer got = missing.get(block);
@@ -403,7 +419,9 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
                 // Wait roundrip + 100ms before considering tuned after changing notes (in case the server rejects an interact)
                 if(lastInteractAt == -1 || System.currentTimeMillis() - lastInteractAt >= ping * 2 + 100) {
                     tuned = true;
+                    pausePlaybackUntil = System.currentTimeMillis() + (long) (Math.abs(Main.config.delayPlaybackStartBySecs) * 1000);
                     tuneInitialUntunedBlocks = -1;
+                    // Tuning finished
                 }
             }
 
@@ -467,13 +485,28 @@ public class SongPlayer implements ClientTickEvents.StartWorldTick {
         }
     }
 
-    private HashMap<Byte, BlockPos> getNotes(Instrument instrument) {
+    private HashMap<Byte, BlockPos> getNotes(NoteBlockInstrument instrument) {
         return noteBlocks.computeIfAbsent(instrument, k -> new HashMap<>());
     }
 
-    // The server limits interacts to 6 Blocks from Player Eye to Block Center
+    // Before 1.20.5, the server limits interacts to 6 Blocks from Player Eye to Block Center
+    // With 1.20.5 and later, the server does a more complex check, to the closest point of a full block hitbox
+    // (max distance is BlockInteractRange + 1.0).
     private boolean canInteractWith(ClientPlayerEntity player, BlockPos blockPos) {
-        return player.getEyePos().squaredDistanceTo(new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5)) <= 6.0*6.0;
+        final Vec3d eyePos = player.getEyePos();
+        if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_4_Or_Earlier) {
+            return eyePos.squaredDistanceTo(blockPos.toCenterPos()) <= 6.0 * 6.0;
+        }else if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_5_Or_Later) {
+            double blockInteractRange = player.getBlockInteractionRange() + 1.0;
+            return new Box(blockPos).squaredMagnitude(eyePos) < blockInteractRange * blockInteractRange;
+        }else if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.All) {
+            // Require both checks to succeed (aka use worst distance)
+            double blockInteractRange = player.getBlockInteractionRange() + 1.0;
+            return eyePos.squaredDistanceTo(blockPos.toCenterPos()) <= 6.0 * 6.0
+                    && new Box(blockPos).squaredMagnitude(eyePos) < blockInteractRange * blockInteractRange;
+        }else {
+            throw new NotImplementedException("ExpectedServerVersion Value not implemented: " + Main.config.expectedServerVersion.name());
+        }
     }
 
     public double getSongElapsedSeconds() {

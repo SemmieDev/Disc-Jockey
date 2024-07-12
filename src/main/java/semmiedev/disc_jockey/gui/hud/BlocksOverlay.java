@@ -4,6 +4,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.ColorHelper;
@@ -15,7 +16,7 @@ public class BlocksOverlay {
 
     private static final ItemStack NOTE_BLOCK = Blocks.NOTE_BLOCK.asItem().getDefaultStack();
 
-    public static void render(DrawContext context, float tickDelta) {
+    public static void render(DrawContext context, RenderTickCounter tickCounter) {
         if (itemStacks != null) {
             context.fill(2, 2, 62, (itemStacks.length + 1) * 20 + 7, ColorHelper.Argb.getArgb(255, 22, 22, 27));
             context.fill(4, 4, 60, (itemStacks.length + 1) * 20 + 5, ColorHelper.Argb.getArgb(255, 42, 42, 47));

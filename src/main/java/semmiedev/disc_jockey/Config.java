@@ -12,6 +12,32 @@ public class Config implements ConfigData {
     @ConfigEntry.Gui.Tooltip(count = 2) public boolean disableAsyncPlayback;
     @ConfigEntry.Gui.Tooltip(count = 2) public boolean omnidirectionalNoteBlockSounds = true;
 
+    public enum ExpectedServerVersion {
+        All,
+        v1_20_4_Or_Earlier,
+        v1_20_5_Or_Later;
+
+        @Override
+        public String toString() {
+            if(this == All) {
+                return "All (universal)";
+            }else if(this == v1_20_4_Or_Earlier) {
+                return "≤1.20.4";
+            }else if (this == v1_20_5_Or_Later) {
+                return "≥1.20.5";
+            }else {
+                return super.toString();
+            }
+        }
+    }
+
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+    @ConfigEntry.Gui.Tooltip(count = 4)
+    public ExpectedServerVersion expectedServerVersion = ExpectedServerVersion.All;
+
+    @ConfigEntry.Gui.Tooltip(count = 1)
+    public float delayPlaybackStartBySecs = 0.0f;
+
     @ConfigEntry.Gui.Excluded
     public ArrayList<String> favorites = new ArrayList<>();
 }

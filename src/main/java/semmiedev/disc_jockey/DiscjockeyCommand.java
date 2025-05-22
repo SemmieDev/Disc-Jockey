@@ -12,10 +12,7 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import semmiedev.disc_jockey.gui.screen.DiscJockeyScreen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -72,11 +69,24 @@ public class DiscjockeyCommand {
                                         })
                                 )
                         )
+                        .then(literal("random")
+                                .executes(context -> {
+                                    if (isLoading(context)) return 0;
+                                    if(SongLoader.SONGS.isEmpty()) {
+                                        context.getSource().sendError(Text.translatable(Main.MOD_ID + ".no_songs"));
+                                        return 0;
+                                    }
+
+                                    Song song = SongLoader.SONGS.get(new Random().nextInt(SongLoader.SONGS.size()));
+                                    Main.SONG_PLAYER.start(song);
+                                    return 0;
+                                })
+                        )
                         .then(literal("stop")
                                 .executes(context -> {
                                     if (Main.SONG_PLAYER.running) {
                                         Main.SONG_PLAYER.stop();
-                                        context.getSource().sendFeedback(Text.translatable(Main.MOD_ID+".stopped_playing", Main.SONG_PLAYER.song));
+                                        context.getSource().sendFeedback(Text.translatable(Main.MOD_ID+".stopped_playing", Main.SONG_PLAYER.song.displayName));
                                         return 1;
                                     }
                                     context.getSource().sendError(Text.translatable(Main.MOD_ID+".not_playing"));
@@ -87,8 +97,7 @@ public class DiscjockeyCommand {
                                 .then(argument("speed", FloatArgumentType.floatArg(0.0001F, 15.0F))
                                         .suggests((context, builder) -> CommandSource.suggestMatching(Arrays.asList("0.5", "0.75", "1", "1.25", "1.5", "2"), builder))
                                         .executes(context -> {
-                                            float newSpeed = FloatArgumentType.getFloat(context, "speed");
-                                            Main.SONG_PLAYER.speed = newSpeed;
+                                            Main.SONG_PLAYER.speed = FloatArgumentType.getFloat(context, "speed");
                                             context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".speed_changed", Main.SONG_PLAYER.speed));
                                             return 0;
                                         })
@@ -101,7 +110,7 @@ public class DiscjockeyCommand {
                                         context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".info_not_running", Main.SONG_PLAYER.speed));
                                         return 0;
                                     }
-                                    if (!Main.SONG_PLAYER.tuned) {
+                                    if (!Main.SONG_PLAYER.tuner.isTuned()) {
                                         context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".info_tuning", Main.SONG_PLAYER.song.displayName, Main.SONG_PLAYER.speed));
                                         return 0;
                                     }else if(!Main.SONG_PLAYER.didSongReachEnd) {
@@ -152,11 +161,11 @@ public class DiscjockeyCommand {
                                                             if(originalInstrument == null) {
                                                                 // All instruments
                                                                 for(NoteBlockInstrument instrument : NoteBlockInstrument.values()) {
-                                                                    Main.SONG_PLAYER.instrumentMap.put(instrument, newInstrument);
+                                                                    Main.SONG_PLAYER.tuner.instrumentMap.put(instrument, newInstrument);
                                                                 }
                                                                 context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".instrument_mapped_all", newInstrumentStr.toLowerCase()));
                                                             }else {
-                                                                Main.SONG_PLAYER.instrumentMap.put(originalInstrument, newInstrument);
+                                                                Main.SONG_PLAYER.tuner.instrumentMap.put(originalInstrument, newInstrument);
                                                                 context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".instrument_mapped", originalInstrumentStr.toLowerCase(), newInstrumentStr.toLowerCase()));
                                                             }
                                                             return 1;
@@ -183,7 +192,7 @@ public class DiscjockeyCommand {
                                                         return 0;
                                                     }
 
-                                                    Main.SONG_PLAYER.instrumentMap.remove(instrument);
+                                                    Main.SONG_PLAYER.tuner.instrumentMap.remove(instrument);
                                                     context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".instrument_unmapped", instrumentStr.toLowerCase()));
                                                     return 1;
                                                 })
@@ -191,16 +200,14 @@ public class DiscjockeyCommand {
                                 )
                                 .then(literal("show")
                                         .executes(context -> {
-                                            if(Main.SONG_PLAYER.instrumentMap.isEmpty()) {
+                                            if(Main.SONG_PLAYER.tuner.instrumentMap.isEmpty()) {
                                                 context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".no_mapped_instruments"));
                                                 return 1;
                                             }
 
                                             StringBuilder maps = new StringBuilder();
-                                            for(Map.Entry<NoteBlockInstrument, NoteBlockInstrument> entry : Main.SONG_PLAYER.instrumentMap.entrySet()) {
-                                                if(maps.length() > 0) {
-                                                    maps.append(", ");
-                                                }
+                                            for(Map.Entry<NoteBlockInstrument, NoteBlockInstrument> entry : Main.SONG_PLAYER.tuner.instrumentMap.entrySet()) {
+                                                if(!maps.isEmpty()) maps.append(", ");
                                                 maps
                                                         .append(entry.getKey().toString().toLowerCase())
                                                         .append("->")
@@ -212,7 +219,7 @@ public class DiscjockeyCommand {
                                 )
                                 .then(literal("clear")
                                         .executes(context -> {
-                                            Main.SONG_PLAYER.instrumentMap.clear();
+                                            Main.SONG_PLAYER.tuner.instrumentMap.clear();
                                             context.getSource().sendFeedback(Text.translatable(Main.MOD_ID + ".instrument_maps_cleared"));
                                             return 1;
                                         })

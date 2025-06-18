@@ -18,8 +18,8 @@ public class BlocksOverlay {
 
     public static void render(DrawContext context, RenderTickCounter tickCounter) {
         if (itemStacks != null) {
-            context.fill(2, 2, 62, (itemStacks.length + 1) * 20 + 7, ColorHelper.Argb.getArgb(255, 22, 22, 27));
-            context.fill(4, 4, 60, (itemStacks.length + 1) * 20 + 5, ColorHelper.Argb.getArgb(255, 42, 42, 47));
+            context.fill(2, 2, 62, (itemStacks.length + 1) * 20 + 7, ColorHelper.getArgb(255, 22, 22, 27));
+            context.fill(4, 4, 60, (itemStacks.length + 1) * 20 + 5, ColorHelper.getArgb(255, 42, 42, 47));
 
             MinecraftClient client = MinecraftClient.getInstance();
             TextRenderer textRenderer = client.textRenderer;

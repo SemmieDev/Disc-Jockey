@@ -22,12 +22,13 @@
       "semmiedev.disc_jockey.ModMenuIntegration"
     ]
   },
+  "accessWidener": "disc_jockey.accesswidener",
   "mixins": [
     "disc_jockey.mixins.json"
   ],
   "depends": {
     "fabric": "*",
-    "minecraft": "~1.21",
+    "minecraft": "~1.21.5",
     "cloth-config": "*"
   }
 }

@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.13-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -11,6 +11,10 @@ repositories {
     maven { url "https://maven.terraformersmc.com/" }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/disc_jockey.accesswidener")
+}
+
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -20,11 +24,11 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    include modApi("me.shedaniel.cloth:cloth-config-fabric:15.0.127") {
+    include modApi("me.shedaniel.cloth:cloth-config-fabric:19.0.146") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
-    modCompileOnly("com.terraformersmc:modmenu:10.0.0-beta.1")
+    modCompileOnly("com.terraformersmc:modmenu:15.0.0-beta.2")
 }
 
 processResources {

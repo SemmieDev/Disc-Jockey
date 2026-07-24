@@ -1,7 +1,7 @@
 package semmiedev.disc_jockey.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -79,20 +79,20 @@ public class SongListWidget extends AbstractSelectionList<SongListWidget.SongEnt
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
+        public void extractContent(GuiGraphicsExtractor extractor, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
             int x = this.getX();
             int y = this.getY();
             int entryWidth = this.getWidth();
             int entryHeight = this.getHeight();
 
             if (selected) {
-                context.fill(x, y, x + entryWidth, y + entryHeight, 0xFFFFFF);
-                context.fill(x + 1, y + 1, x + entryWidth - 1, y + entryHeight - 1, 0x000000);
+                extractor.fill(x, y, x + entryWidth, y + entryHeight, 0xFFFFFF);
+                extractor.fill(x + 1, y + 1, x + entryWidth - 1, y + entryHeight - 1, 0x000000);
             }
 
-            context.drawCenteredString(client.font, song.displayName, x + entryWidth / 2, y + 5, selected ? 0xFFFFFFFF : 0xFF808080);
+            extractor.centeredText(client.font, song.displayName, x + entryWidth / 2, y + 5, selected ? 0xFFFFFFFF : 0xFF808080);
 
-            context.blit(RenderPipelines.GUI_TEXTURED, ICONS, x + 2, y + 2, (favorite ? 26 : 0) + (isOverFavoriteButton(mouseX, mouseY) ? 13 : 0), 0, 13, 12, 52, 12);
+            extractor.blit(RenderPipelines.GUI_TEXTURED, ICONS, x + 2, y + 2, (favorite ? 26 : 0) + (isOverFavoriteButton(mouseX, mouseY) ? 13 : 0), 0, 13, 12, 52, 12);
         }
 
         public Component getNarrateText() {

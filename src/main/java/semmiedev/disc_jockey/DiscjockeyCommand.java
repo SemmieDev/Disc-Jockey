@@ -14,8 +14,8 @@ import semmiedev.disc_jockey.gui.screen.DiscJockeyScreen;
 
 import java.util.*;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 
 public class DiscjockeyCommand {
 
@@ -36,7 +36,7 @@ public class DiscjockeyCommand {
                             FabricClientCommandSource source = context.getSource();
                             if (!isLoading(context)) {
                                 Minecraft client = source.getClient();
-                                client.schedule(() -> client.setScreen(new DiscJockeyScreen()));
+                                client.schedule(() -> client.gui.setScreen(new DiscJockeyScreen()));
                                 return 1;
                             }
                             return 0;

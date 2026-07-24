@@ -37,7 +37,7 @@ public class SongLoader {
             for (Song song : SONGS) SONG_SUGGESTIONS.add(song.displayName);
             Main.config.favorites.removeIf(favorite -> SongLoader.SONGS.stream().map(song -> song.fileName).noneMatch(favorite::equals));
 
-            if (showToast && Minecraft.getInstance().font != null) SystemToast.add(Minecraft.getInstance().getToastManager(), SystemToast.SystemToastId.PACK_LOAD_FAILURE, Main.NAME, Component.translatable(Main.MOD_ID+".loading_done"));
+            if (showToast && Minecraft.getInstance().font != null) SystemToast.add(Minecraft.getInstance().gui.toastManager(), SystemToast.SystemToastId.PACK_LOAD_FAILURE, Main.NAME, Component.translatable(Main.MOD_ID+".loading_done"));
             showToast = true;
             loadingSongs = false;
         }).start();

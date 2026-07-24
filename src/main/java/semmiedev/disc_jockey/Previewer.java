@@ -6,7 +6,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 
-public class Previewer implements ClientTickEvents.StartWorldTick {
+public class Previewer implements ClientTickEvents.StartLevelTick {
     public boolean running;
 
     private int i;
@@ -31,7 +31,7 @@ public class Previewer implements ClientTickEvents.StartWorldTick {
         while (running) {
             long note = song.notes[i];
             if ((short)note == Math.round(tick)) {
-                Vec3 pos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+                Vec3 pos = Minecraft.getInstance().gameRenderer.mainCamera().position();
                 world.playLocalSound(pos.x, pos.y, pos.z, Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)].getSoundEvent().value(), SoundSource.RECORDS, 3, (float)Math.pow(2.0, ((byte)(note >> Note.NOTE_SHIFT) - 12) / 12.0), false);
                 i++;
                 if (i >= song.notes.length) {

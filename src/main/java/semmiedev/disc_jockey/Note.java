@@ -40,7 +40,7 @@ public record Note(NoteBlockInstrument instrument, byte note) {
         INSTRUMENT_BLOCKS.put(NoteBlockInstrument.BASS, Blocks.OAK_PLANKS);
         INSTRUMENT_BLOCKS.put(NoteBlockInstrument.FLUTE, Blocks.CLAY);
         INSTRUMENT_BLOCKS.put(NoteBlockInstrument.BELL, Blocks.GOLD_BLOCK);
-        INSTRUMENT_BLOCKS.put(NoteBlockInstrument.GUITAR, Blocks.WHITE_WOOL);
+        INSTRUMENT_BLOCKS.put(NoteBlockInstrument.GUITAR, Blocks.WOOL.white());
         INSTRUMENT_BLOCKS.put(NoteBlockInstrument.CHIME, Blocks.PACKED_ICE);
         INSTRUMENT_BLOCKS.put(NoteBlockInstrument.XYLOPHONE, Blocks.BONE_BLOCK);
         INSTRUMENT_BLOCKS.put(NoteBlockInstrument.IRON_XYLOPHONE, Blocks.IRON_BLOCK);

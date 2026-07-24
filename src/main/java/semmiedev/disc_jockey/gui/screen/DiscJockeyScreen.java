@@ -1,8 +1,8 @@
 package semmiedev.disc_jockey.gui.screen;
 
-import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.AutoConfigClient;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
@@ -100,7 +100,7 @@ public class DiscJockeyScreen extends Screen {
             if (BlocksOverlay.itemStacks == null) {
                 SongListWidget.SongEntry entry = songListWidget.getSelected();
                 if (entry != null) {
-                    minecraft.setScreen(null);
+                    minecraft.gui.setScreen(null);
 
                     BlocksOverlay.itemStacks = new ItemStack[0];
                     BlocksOverlay.amounts = new int[0];
@@ -130,7 +130,7 @@ public class DiscJockeyScreen extends Screen {
                 }
             } else {
                 BlocksOverlay.itemStacks = null;
-                minecraft.setScreen(null);
+                minecraft.gui.setScreen(null);
             }
         }).bounds((width / 4 * 3) + 60, height - 61, 100, 20).build());
 
@@ -172,7 +172,9 @@ public class DiscJockeyScreen extends Screen {
         addRenderableWidget(stopButton);
 
         // Config button in bottom left
-        configButton = Button.builder(CONFIG, (button) -> minecraft.setScreen(AutoConfig.getConfigScreen(Config.class, this).get()))
+        configButton = Button.builder(CONFIG, (button) ->
+            minecraft.gui.setScreen(AutoConfigClient.<Config>getConfigScreen(Config.class, this).get())
+        )
                 .pos(10, height - 30)
                 .size(100, 20)
                 .build();
@@ -202,17 +204,17 @@ public class DiscJockeyScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.renderBackground(context, mouseX, mouseY, delta);
-        context.blit(RenderPipelines.GUI_TEXTURED, AbstractSelectionList.INWORLD_MENU_LIST_BACKGROUND, 5, 32, width / 2, 32 + 20 + 20 + 30 + 5 + 20 + 5, this.width / 2 - 10, 20 + 20 + 30 + 5 + 20 + 5, 32, 32);
+    public void extractBackground(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float delta) {
+        super.extractBackground(extractor, mouseX, mouseY, delta);
+        extractor.blit(RenderPipelines.GUI_TEXTURED, Screen.MENU_BACKGROUND, 5, 32, width / 2, 32 + 20 + 20 + 30 + 5 + 20 + 5, this.width / 2 - 10, 20 + 20 + 30 + 5 + 20 + 5, 32, 32);
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor extractor, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(extractor, mouseX, mouseY, delta);
 
-        context.drawCenteredString(font, DROP_HINT, width / 2, 5, 0xFFFFFF);
-        context.drawCenteredString(font, SELECT_SONG, (width / 4 * 3), 20, 0xFFFFFF);
+        extractor.centeredText(font, DROP_HINT, width / 2, 5, 0xFFFFFF);
+        extractor.centeredText(font, SELECT_SONG, (width / 4 * 3), 20, 0xFFFFFF);
     }
 
     @Override
@@ -250,7 +252,7 @@ public class DiscJockeyScreen extends Screen {
         String string = paths.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
         if (string.length() > 300) string = string.substring(0, 300)+"...";
 
-        minecraft.setScreen(new ConfirmScreen(confirmed -> {
+        minecraft.gui.setScreen(new ConfirmScreen(confirmed -> {
             if (confirmed) {
                 paths.forEach(path -> {
                     try {
@@ -270,7 +272,7 @@ public class DiscJockeyScreen extends Screen {
 
                 SongLoader.sort();
             }
-            minecraft.setScreen(this);
+            minecraft.gui.setScreen(this);
         }, Component.translatable(Main.MOD_ID+".screen.drop_confirm"), Component.literal(string)));
     }
 

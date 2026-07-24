@@ -23,14 +23,14 @@ public class Util {
 
         final Vec3 eyePos = player.getEyePosition();
         if (Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_4_Or_Earlier) {
-            return eyePos.distanceToSqr(blockPos.getCenter()) <= 6.0 * 6.0;
+            return eyePos.distanceToSqr(Vec3.atCenterOf(blockPos)) <= 6.0 * 6.0;
         } else if (Main.config.expectedServerVersion == Config.ExpectedServerVersion.v1_20_5_Or_Later) {
             double blockInteractRange = player.blockInteractionRange() + 1.0;
             return new AABB(blockPos).distanceToSqr(eyePos) < blockInteractRange * blockInteractRange;
         } else if(Main.config.expectedServerVersion == Config.ExpectedServerVersion.All) {
             // Require both checks to succeed (aka use worst distance)
             double blockInteractRange = player.blockInteractionRange() + 1.0;
-            return eyePos.distanceToSqr(blockPos.getCenter()) <= 6.0 * 6.0
+            return eyePos.distanceToSqr(Vec3.atCenterOf(blockPos)) <= 6.0 * 6.0
                     && new AABB(blockPos).distanceToSqr(eyePos) < blockInteractRange * blockInteractRange;
         } else {
             throw new NotImplementedException("ExpectedServerVersion Value not implemented: " + Main.config.expectedServerVersion.name());

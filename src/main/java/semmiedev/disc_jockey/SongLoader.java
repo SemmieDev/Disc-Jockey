@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
@@ -89,6 +88,7 @@ public class SongLoader {
 
             short tick = -1;
             short jumps;
+            ArrayList<Long> noteList = new ArrayList<>();
             while ((jumps = reader.readShort()) != 0) {
                 tick += jumps;
                 short layer = -1;
@@ -114,9 +114,13 @@ public class SongLoader {
                     Note note = new Note(Note.INSTRUMENTS[instrumentId], noteId);
                     if (!song.uniqueNotes.contains(note)) song.uniqueNotes.add(note);
 
-                    song.notes = Arrays.copyOf(song.notes, song.notes.length + 1);
-                    song.notes[song.notes.length - 1] = tick | layer << Note.LAYER_SHIFT | (long)instrumentId << Note.INSTRUMENT_SHIFT | (long)noteId << Note.NOTE_SHIFT;
+                    noteList.add(tick | layer << Note.LAYER_SHIFT | (long)instrumentId << Note.INSTRUMENT_SHIFT | (long)noteId << Note.NOTE_SHIFT);
                 }
+            }
+
+            song.notes = new long[noteList.size()];
+            for (int i = 0; i < noteList.size(); i++) {
+                song.notes[i] = noteList.get(i);
             }
 
             return song;

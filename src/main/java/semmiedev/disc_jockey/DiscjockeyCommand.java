@@ -264,6 +264,9 @@ public class DiscjockeyCommand {
     }
 
     private static String formatTimestamp(int seconds) {
+        if (seconds < 0) {
+            return "-" + formatTimestamp(-seconds);
+        }
         return padZeroes(seconds / 60, 2) + ":" + padZeroes(seconds % 60, 2);
     }
 }

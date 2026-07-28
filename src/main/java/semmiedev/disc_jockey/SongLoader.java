@@ -51,13 +51,13 @@ public class SongLoader {
 
             song.fileName = file.getName().replaceAll("[\\n\\r]", "");
 
-            song.length = reader.readShort();
+            song.length = reader.readUShort();
 
             boolean newFormat = song.length == 0;
             if (newFormat) {
                 song.formatVersion = reader.readByte();
                 song.vanillaInstrumentCount = reader.readByte();
-                song.length = reader.readShort();
+                song.length = reader.readUShort();
             }
 
             song.height = reader.readShort();

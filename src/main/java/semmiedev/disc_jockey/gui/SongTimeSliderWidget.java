@@ -18,6 +18,9 @@ public class SongTimeSliderWidget extends AbstractSliderButton {
     }
 
     private static String formatTimestamp(int seconds) {
+        if (seconds < 0) {
+            return "-" + formatTimestamp(-seconds);
+        }
         return padZeroes(seconds / 60, 2) + ":" + padZeroes(seconds % 60, 2);
     }
 
@@ -40,9 +43,13 @@ public class SongTimeSliderWidget extends AbstractSliderButton {
 
     public void update() {
         if (Main.SONG_PLAYER.song == null) return;
-        double elapsed = Main.SONG_PLAYER.getSongElapsedSeconds();
-        double total = Main.SONG_PLAYER.song == null ? 1 : Main.SONG_PLAYER.song.getLengthInSeconds();
-        value = elapsed / total;
+        double total = Main.SONG_PLAYER.song.getLengthInSeconds();
+        if (total <= 0) {
+            value = 0.0;
+        } else {
+            double elapsed = Main.SONG_PLAYER.getSongElapsedSeconds();
+            value = Math.max(0.0, Math.min(1.0, elapsed / total));
+        }
         updateMessage();
     }
 }

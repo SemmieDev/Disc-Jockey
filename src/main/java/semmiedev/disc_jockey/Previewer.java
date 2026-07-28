@@ -14,13 +14,17 @@ public class Previewer implements ClientTickEvents.StartLevelTick {
     private Song song;
 
     public void start(Song song) {
+        if (song == null) return;
+        Main.TICK_LISTENERS.remove(this);
         this.song = song;
-        Main.TICK_LISTENERS.add(this);
         running = true;
+        i = 0;
+        tick = 0;
+        Main.TICK_LISTENERS.add(this);
     }
 
     public void stop() {
-        Minecraft.getInstance().schedule(() -> Main.TICK_LISTENERS.remove(this));
+        Main.TICK_LISTENERS.remove(this);
         running = false;
         i = 0;
         tick = 0;
@@ -28,9 +32,13 @@ public class Previewer implements ClientTickEvents.StartLevelTick {
 
     @Override
     public void onStartTick(ClientLevel world) {
-        while (running) {
+        if (!running || song == null || i >= song.notes.length) {
+            return;
+        }
+
+        while (running && i < song.notes.length) {
             long note = song.notes[i];
-            if ((short)note == Math.round(tick)) {
+            if ((short)note <= Math.round(tick)) {
                 Vec3 pos = Minecraft.getInstance().gameRenderer.mainCamera().position();
                 world.playLocalSound(pos.x, pos.y, pos.z, Note.INSTRUMENTS[(byte)(note >> Note.INSTRUMENT_SHIFT)].getSoundEvent().value(), SoundSource.RECORDS, 3, (float)Math.pow(2.0, ((byte)(note >> Note.NOTE_SHIFT) - 12) / 12.0), false);
                 i++;
@@ -43,6 +51,8 @@ public class Previewer implements ClientTickEvents.StartLevelTick {
             }
         }
 
-        tick += song.tempo / 100f / 20f;
+        if (running) {
+            tick += song.tempo / 100f / 20f;
+        }
     }
 }

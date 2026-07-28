@@ -1,16 +1,15 @@
 package semmiedev.disc_jockey;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.text.Text;
 import semmiedev.disc_jockey.gui.SongListWidget;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.network.chat.Component;
 
 public class SongLoader {
     public static final ArrayList<Song> SONGS = new ArrayList<>();
@@ -37,7 +36,9 @@ public class SongLoader {
             for (Song song : SONGS) SONG_SUGGESTIONS.add(song.displayName);
             Main.config.favorites.removeIf(favorite -> SongLoader.SONGS.stream().map(song -> song.fileName).noneMatch(favorite::equals));
 
-            if (showToast && MinecraftClient.getInstance().textRenderer != null) SystemToast.add(MinecraftClient.getInstance().getToastManager(), SystemToast.Type.PACK_LOAD_FAILURE, Main.NAME, Text.translatable(Main.MOD_ID+".loading_done"));
+            if (showToast) Minecraft.getInstance().execute(() -> {
+                if (Minecraft.getInstance().font != null) SystemToast.add(Minecraft.getInstance().gui.toastManager(), SystemToast.SystemToastId.PACK_LOAD_FAILURE, Main.NAME, Component.translatable(Main.MOD_ID+".loading_done"));
+            });
             showToast = true;
             loadingSongs = false;
         }).start();
@@ -50,13 +51,13 @@ public class SongLoader {
 
             song.fileName = file.getName().replaceAll("[\\n\\r]", "");
 
-            song.length = reader.readShort();
+            song.length = reader.readUShort();
 
             boolean newFormat = song.length == 0;
             if (newFormat) {
                 song.formatVersion = reader.readByte();
                 song.vanillaInstrumentCount = reader.readByte();
-                song.length = reader.readShort();
+                song.length = reader.readUShort();
             }
 
             song.height = reader.readShort();
@@ -89,6 +90,7 @@ public class SongLoader {
 
             short tick = -1;
             short jumps;
+            ArrayList<Long> noteList = new ArrayList<>();
             while ((jumps = reader.readShort()) != 0) {
                 tick += jumps;
                 short layer = -1;
@@ -114,9 +116,13 @@ public class SongLoader {
                     Note note = new Note(Note.INSTRUMENTS[instrumentId], noteId);
                     if (!song.uniqueNotes.contains(note)) song.uniqueNotes.add(note);
 
-                    song.notes = Arrays.copyOf(song.notes, song.notes.length + 1);
-                    song.notes[song.notes.length - 1] = tick | layer << Note.LAYER_SHIFT | (long)instrumentId << Note.INSTRUMENT_SHIFT | (long)noteId << Note.NOTE_SHIFT;
+                    noteList.add(tick | layer << Note.LAYER_SHIFT | (long)instrumentId << Note.INSTRUMENT_SHIFT | (long)noteId << Note.NOTE_SHIFT);
                 }
+            }
+
+            song.notes = new long[noteList.size()];
+            for (int i = 0; i < noteList.size(); i++) {
+                song.notes[i] = noteList.get(i);
             }
 
             return song;

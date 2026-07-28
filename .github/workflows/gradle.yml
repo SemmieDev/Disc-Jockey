@@ -1,0 +1,36 @@
+name: Build
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Get latest short hash
+        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Capture build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Disc-Jockey-${{ env.COMMIT_HASH }}
+          path: build/libs/
